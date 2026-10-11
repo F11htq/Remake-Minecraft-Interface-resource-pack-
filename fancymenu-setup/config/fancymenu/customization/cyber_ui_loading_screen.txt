@@ -1,0 +1,202 @@
+type = fancymenu_layout
+
+
+
+layout-meta {
+  identifier = drippy_loading_overlay
+  render_custom_elements_behind_vanilla = false
+  last_edited_time = 0
+  is_enabled = true
+  randommode = false
+  randomgroup = 1
+  randomonlyfirsttime = false
+  layout_index = 0
+}
+
+menu_background {
+  background_type = drippy_color_background
+  instance_identifier = cyber_ui_loading_background
+  color = #0A0A0F
+}
+
+element {
+  element_type = image
+  instance_identifier = cyber_ui_loading_logo
+  appearance_delay = no_delay
+  appearance_delay_seconds = 1.0
+  fade_in_v2 = no_fading
+  fade_in_speed = 1.0
+  fade_out = no_fading
+  fade_out_speed = 1.0
+  base_opacity = 1.0
+  anchor_point = mid-centered
+  x = 0
+  y = -46
+  width = 260
+  height = 55
+  stretch_x = false
+  stretch_y = false
+  stay_on_screen = false
+  element_loading_requirement_container_identifier = cyber_ui_loading_logo_req
+  enable_parallax = false
+  parallax_intensity_v2 = 0.5
+  invert_parallax = false
+  load_once_per_session = false
+  layer_hidden_in_editor = false
+  sticky_anchor = true
+  source = [source:local]/config/fancymenu/assets/cyber_ui/logo.apng
+  repeat_texture = false
+  nine_slice_texture = false
+  nine_slice_texture_border_x = 5
+  nine_slice_texture_border_y = 5
+  image_tint = #FFFFFF
+  restart_animated_on_menu_load = true
+}
+
+element {
+  element_type = progress_bar
+  instance_identifier = cyber_ui_loading_bar
+  appearance_delay = no_delay
+  appearance_delay_seconds = 1.0
+  fade_in_v2 = no_fading
+  fade_in_speed = 1.0
+  fade_out = no_fading
+  fade_out_speed = 1.0
+  base_opacity = 1.0
+  anchor_point = mid-centered
+  x = 0
+  y = 22
+  width = 200
+  height = 8
+  stretch_x = false
+  stretch_y = false
+  stay_on_screen = false
+  element_loading_requirement_container_identifier = cyber_ui_loading_bar_req
+  enable_parallax = false
+  parallax_intensity_v2 = 0.5
+  invert_parallax = false
+  load_once_per_session = false
+  layer_hidden_in_editor = false
+  sticky_anchor = true
+  bar_color = #FCEE0A
+  background_color = #0A0A0F
+  bar_texture = [source:local]/config/fancymenu/assets/cyber_ui/progress_bar.png
+  background_texture = [source:local]/config/fancymenu/assets/cyber_ui/progress_background.png
+  direction = right
+  value_mode = percentage
+  progress_source = {"placeholder":"game_loading_progress"}
+  smooth_filling_animation = true
+  progress_for_element_anchor = false
+}
+
+element {
+  element_type = image
+  instance_identifier = cyber_ui_loading_text
+  appearance_delay = no_delay
+  appearance_delay_seconds = 1.0
+  fade_in_v2 = no_fading
+  fade_in_speed = 1.0
+  fade_out = no_fading
+  fade_out_speed = 1.0
+  base_opacity = 1.0
+  anchor_point = mid-centered
+  x = 0
+  y = 47
+  width = 200
+  height = 22
+  stretch_x = false
+  stretch_y = false
+  stay_on_screen = false
+  element_loading_requirement_container_identifier = cyber_ui_loading_text_req
+  enable_parallax = false
+  parallax_intensity_v2 = 0.5
+  invert_parallax = false
+  load_once_per_session = false
+  layer_hidden_in_editor = false
+  sticky_anchor = true
+  source = [source:local]/config/fancymenu/assets/cyber_ui/boot_text.apng
+  repeat_texture = false
+  nine_slice_texture = false
+  nine_slice_texture_border_x = 5
+  nine_slice_texture_border_y = 5
+  image_tint = #FFFFFF
+  restart_animated_on_menu_load = false
+}
+
+element {
+  element_type = image
+  instance_identifier = cyber_ui_loading_hazard_bottom-left
+  appearance_delay = no_delay
+  appearance_delay_seconds = 1.0
+  fade_in_v2 = no_fading
+  fade_in_speed = 1.0
+  fade_out = no_fading
+  fade_out_speed = 1.0
+  base_opacity = 1.0
+  anchor_point = bottom-left
+  x = 0
+  y = -3
+  width = %guiwidth%
+  height = 3
+  stretch_x = false
+  stretch_y = false
+  stay_on_screen = false
+  element_loading_requirement_container_identifier = cyber_ui_loading_hazard_bottom-left_req
+  enable_parallax = false
+  parallax_intensity_v2 = 0.5
+  invert_parallax = false
+  load_once_per_session = false
+  layer_hidden_in_editor = false
+  source = [source:local]/config/fancymenu/assets/cyber_ui/hazard_strip.apng
+  repeat_texture = true
+  nine_slice_texture = false
+  nine_slice_texture_border_x = 5
+  nine_slice_texture_border_y = 5
+  image_tint = #FFFFFF
+  restart_animated_on_menu_load = false
+}
+
+element {
+  element_type = image
+  instance_identifier = cyber_ui_loading_hazard_top-left
+  appearance_delay = no_delay
+  appearance_delay_seconds = 1.0
+  fade_in_v2 = no_fading
+  fade_in_speed = 1.0
+  fade_out = no_fading
+  fade_out_speed = 1.0
+  base_opacity = 1.0
+  anchor_point = top-left
+  x = 0
+  y = 0
+  width = %guiwidth%
+  height = 3
+  stretch_x = false
+  stretch_y = false
+  stay_on_screen = false
+  element_loading_requirement_container_identifier = cyber_ui_loading_hazard_top-left_req
+  enable_parallax = false
+  parallax_intensity_v2 = 0.5
+  invert_parallax = false
+  load_once_per_session = false
+  layer_hidden_in_editor = false
+  source = [source:local]/config/fancymenu/assets/cyber_ui/hazard_strip.apng
+  repeat_texture = true
+  nine_slice_texture = false
+  nine_slice_texture_border_x = 5
+  nine_slice_texture_border_y = 5
+  image_tint = #FFFFFF
+  restart_animated_on_menu_load = false
+}
+
+vanilla_button {
+  element_type = vanilla_button
+  instance_identifier = mojang_logo
+  is_hidden = true
+}
+
+vanilla_button {
+  element_type = vanilla_button
+  instance_identifier = progress_bar
+  is_hidden = true
+}
