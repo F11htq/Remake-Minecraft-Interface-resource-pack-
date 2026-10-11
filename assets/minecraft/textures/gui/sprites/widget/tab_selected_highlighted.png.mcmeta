@@ -1,10 +1,4 @@
 {
-  "animation": {
-    "frametime": 3,
-    "interpolate": true,
-    "width": 130,
-    "height": 24
-  },
   "gui": {
     "scaling": {
       "type": "nine_slice",

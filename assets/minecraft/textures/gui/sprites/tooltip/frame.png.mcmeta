@@ -1,7 +1,24 @@
 {
   "animation": {
     "frametime": 2,
-    "interpolate": true
+    "frames": [
+      {
+        "index": 0,
+        "time": 70
+      },
+      {
+        "index": 1,
+        "time": 1
+      },
+      {
+        "index": 2,
+        "time": 2
+      },
+      {
+        "index": 3,
+        "time": 1
+      }
+    ]
   },
   "gui": {
     "scaling": {

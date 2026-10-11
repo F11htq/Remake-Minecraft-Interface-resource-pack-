@@ -1,7 +1,48 @@
 {
   "animation": {
     "frametime": 2,
-    "interpolate": true
+    "frames": [
+      {
+        "index": 0,
+        "time": 1
+      },
+      {
+        "index": 1,
+        "time": 1
+      },
+      {
+        "index": 2,
+        "time": 1
+      },
+      {
+        "index": 3,
+        "time": 6
+      },
+      {
+        "index": 4,
+        "time": 6
+      },
+      {
+        "index": 5,
+        "time": 6
+      },
+      {
+        "index": 6,
+        "time": 6
+      },
+      {
+        "index": 7,
+        "time": 6
+      },
+      {
+        "index": 8,
+        "time": 6
+      },
+      {
+        "index": 9,
+        "time": 6
+      }
+    ]
   },
   "gui": {
     "scaling": {

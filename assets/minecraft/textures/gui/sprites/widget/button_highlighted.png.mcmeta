@@ -1,7 +1,24 @@
 {
   "animation": {
-    "frametime": 3,
-    "interpolate": true,
+    "frametime": 2,
+    "frames": [
+      {
+        "index": 0,
+        "time": 50
+      },
+      {
+        "index": 1,
+        "time": 1
+      },
+      {
+        "index": 2,
+        "time": 1
+      },
+      {
+        "index": 3,
+        "time": 1
+      }
+    ],
     "width": 200,
     "height": 20
   },
@@ -10,7 +27,7 @@
       "type": "nine_slice",
       "width": 200,
       "height": 20,
-      "border": 3
+      "border": 5
     }
   }
 }
