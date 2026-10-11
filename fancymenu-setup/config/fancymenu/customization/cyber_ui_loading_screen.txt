@@ -21,6 +21,39 @@ menu_background {
 
 element {
   element_type = image
+  instance_identifier = cyber_ui_loading_grid
+  appearance_delay = no_delay
+  appearance_delay_seconds = 1.0
+  fade_in_v2 = no_fading
+  fade_in_speed = 1.0
+  fade_out = no_fading
+  fade_out_speed = 1.0
+  base_opacity = 1.0
+  anchor_point = top-left
+  x = 0
+  y = 0
+  width = %guiwidth%
+  height = %guiheight%
+  stretch_x = false
+  stretch_y = false
+  stay_on_screen = false
+  element_loading_requirement_container_identifier = cyber_ui_loading_grid_req
+  enable_parallax = false
+  parallax_intensity_v2 = 0.5
+  invert_parallax = false
+  load_once_per_session = false
+  layer_hidden_in_editor = false
+  source = [source:local]/config/fancymenu/assets/cyber_ui/bg_boot.gif
+  repeat_texture = false
+  nine_slice_texture = false
+  nine_slice_texture_border_x = 5
+  nine_slice_texture_border_y = 5
+  image_tint = #FFFFFF
+  restart_animated_on_menu_load = false
+}
+
+element {
+  element_type = image
   instance_identifier = cyber_ui_loading_logo
   appearance_delay = no_delay
   appearance_delay_seconds = 1.0
@@ -51,6 +84,108 @@ element {
   nine_slice_texture_border_y = 5
   image_tint = #FFFFFF
   restart_animated_on_menu_load = true
+}
+
+element {
+  element_type = animation_controller
+  instance_identifier = cyber_ui_loading_logo_anim
+  appearance_delay = no_delay
+  appearance_delay_seconds = 1.0
+  fade_in_v2 = no_fading
+  fade_in_speed = 1.0
+  fade_out = no_fading
+  fade_out_speed = 1.0
+  base_opacity = 1.0
+  anchor_point = top-left
+  x = 0
+  y = 0
+  width = 1
+  height = 1
+  stretch_x = false
+  stretch_y = false
+  stay_on_screen = false
+  element_loading_requirement_container_identifier = cyber_ui_loading_logo_anim_req
+  enable_parallax = false
+  parallax_intensity_v2 = 0.5
+  invert_parallax = false
+  load_once_per_session = false
+  layer_hidden_in_editor = false
+  target_element_ids = ["cyber_ui_loading_logo"]
+  keyframes = [{"timestamp":0,"posOffsetX":0,"posOffsetY":-160,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_loading_logo_anim_k0"},{"timestamp":58,"posOffsetX":0,"posOffsetY":-123,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_loading_logo_anim_k1"},{"timestamp":116,"posOffsetX":0,"posOffsetY":-93,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_loading_logo_anim_k2"},{"timestamp":175,"posOffsetX":0,"posOffsetY":-68,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_loading_logo_anim_k3"},{"timestamp":233,"posOffsetX":0,"posOffsetY":-47,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_loading_logo_anim_k4"},{"timestamp":291,"posOffsetX":0,"posOffsetY":-32,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_loading_logo_anim_k5"},{"timestamp":350,"posOffsetX":0,"posOffsetY":-20,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_loading_logo_anim_k6"},{"timestamp":408,"posOffsetX":0,"posOffsetY":-12,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_loading_logo_anim_k7"},{"timestamp":466,"posOffsetX":0,"posOffsetY":-6,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_loading_logo_anim_k8"},{"timestamp":525,"posOffsetX":0,"posOffsetY":-2,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_loading_logo_anim_k9"},{"timestamp":583,"posOffsetX":0,"posOffsetY":-1,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_loading_logo_anim_k10"},{"timestamp":641,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_loading_logo_anim_k11"},{"timestamp":700,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_loading_logo_anim_k12"}]
+  loop = false
+  offset_mode = true
+  ignore_size = true
+  ignore_position = false
+}
+
+element {
+  element_type = image
+  instance_identifier = cyber_ui_loading_spinner
+  appearance_delay = no_delay
+  appearance_delay_seconds = 1.0
+  fade_in_v2 = no_fading
+  fade_in_speed = 1.0
+  fade_out = no_fading
+  fade_out_speed = 1.0
+  base_opacity = 1.0
+  anchor_point = mid-centered
+  x = -112
+  y = 22
+  width = 16
+  height = 16
+  stretch_x = false
+  stretch_y = false
+  stay_on_screen = false
+  element_loading_requirement_container_identifier = cyber_ui_loading_spinner_req
+  enable_parallax = false
+  parallax_intensity_v2 = 0.5
+  invert_parallax = false
+  load_once_per_session = false
+  layer_hidden_in_editor = false
+  sticky_anchor = true
+  source = [source:local]/config/fancymenu/assets/cyber_ui/spinner.apng
+  repeat_texture = false
+  nine_slice_texture = false
+  nine_slice_texture_border_x = 5
+  nine_slice_texture_border_y = 5
+  image_tint = #FFFFFF
+  restart_animated_on_menu_load = false
+}
+
+element {
+  element_type = text_v2
+  instance_identifier = cyber_ui_loading_percent
+  appearance_delay = no_delay
+  appearance_delay_seconds = 1.0
+  fade_in_v2 = no_fading
+  fade_in_speed = 1.0
+  fade_out = no_fading
+  fade_out_speed = 1.0
+  base_opacity = 1.0
+  anchor_point = mid-centered
+  x = 104
+  y = 18
+  width = 40
+  height = 10
+  stretch_x = false
+  stretch_y = false
+  stay_on_screen = false
+  element_loading_requirement_container_identifier = cyber_ui_loading_percent_req
+  enable_parallax = false
+  parallax_intensity_v2 = 0.5
+  invert_parallax = false
+  load_once_per_session = false
+  layer_hidden_in_editor = false
+  source = {"placeholder":"game_loading_progress"}%
+  source_mode = direct
+  shadow = false
+  scale = 1.0
+  base_color = #FCEE0A
+  text_border = 0
+  line_spacing = 1
+  enable_scrolling = false
+  auto_line_wrapping = false
+  interactable = false
 }
 
 element {

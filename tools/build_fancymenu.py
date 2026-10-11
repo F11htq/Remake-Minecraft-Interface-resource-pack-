@@ -176,7 +176,234 @@ def build_background():
         if i in (9, 10):
             img = bp.glitch(img.convert("RGBA"), random.Random(i), bands=4, max_shift=10).convert("RGB")
         frames.append(img)
-    save_gif(frames, [70] * N, "background.gif")
+    save_gif(frames, [70] * N, "bg_city.gif")
+
+
+def scanlines(img, k=0.22):
+    px = img.load()
+    for y in range(0, img.height, 2):
+        for x in range(img.width):
+            px[x, y] = lerp(px[x, y], (0, 0, 0), k)
+
+
+# --------------------------------------------------------------------------
+# Background: retro neon grid with a striped sunset
+# --------------------------------------------------------------------------
+def build_bg_synthwave():
+    W, H, N = 480, 270, 20
+    hor = 150
+    rng = random.Random(84)
+    stars = [(rng.randrange(W), rng.randrange(hor - 20), rng.random()) for _ in range(90)]
+    sky = Image.new("RGB", (W, H))
+    for y in range(H):
+        t = min(1.0, y / hor)
+        c = lerp((6, 2, 12), (80, 0, 40), t ** 2) if y < hor else (6, 3, 10)
+        for x in range(W):
+            sky.putpixel((x, y), c)
+    # sun with horizontal cut stripes
+    cx, cy, r = W // 2, hor - 8, 62
+    for y in range(cy - r, hor):
+        for x in range(cx - r, cx + r):
+            if (x - cx) ** 2 + (y - cy) ** 2 <= r * r:
+                t = (y - (cy - r)) / (hor - (cy - r))
+                band = y > cy - 18 and ((y - (cy - 18)) // 4) % 2 == 1 and (y - cy + 18) // 4 >= 0
+                gap = band and ((y - (cy - 18)) % 4) < 1 + int(t * 3)
+                if not gap:
+                    sky.putpixel((x, y), lerp(YELLOW, RED, t))
+    # mountains
+    for x in range(W):
+        h1 = int(18 + 14 * math.sin(x * 0.031) + 9 * math.sin(x * 0.083 + 1.3))
+        for y in range(hor - max(0, h1), hor):
+            sky.putpixel((x, y), (14, 4, 20) if y > hor - h1 + 1 else (120, 0, 50))
+
+    frames = []
+    for i in range(N):
+        img = sky.copy()
+        px = img.load()
+        for (sx, sy, ph) in stars:
+            if (i + int(ph * N)) % 7:
+                px[sx, sy] = lerp((0, 0, 0), (220, 220, 255), 0.4 + 0.6 * ph)
+        # floor grid: horizontal lines move towards the viewer, one spacing per loop
+        for k in range(40):
+            z = k + 1 - i / N  # distance; shifts by exactly one line per loop
+            if z <= 0:
+                continue
+            y = hor + int(round(110 / z))
+            if hor < y < H:
+                depth = min(1.0, 1.4 / z)
+                c = lerp((90, 0, 40), YELLOW, depth)
+                for x in range(W):
+                    px[x, y] = c
+        for k in range(-24, 25):
+            for y in range(hor + 1, H):
+                t = (y - hor) / (H - hor)
+                x = int(W / 2 + k * 6 + k * 40 * t)
+                if 0 <= x < W:
+                    px[x, y] = lerp((90, 0, 40), (255, 60, 90), t)
+        scanlines(img)
+        if i == 13:
+            img = bp.glitch(img.convert("RGBA"), random.Random(i), bands=3, max_shift=8).convert("RGB")
+        frames.append(img)
+    save_gif(frames, [70] * N, "bg_synthwave.gif")
+
+
+# --------------------------------------------------------------------------
+# Background: falling data glyphs
+# --------------------------------------------------------------------------
+def build_bg_datastream():
+    W, H, N = 480, 270, 24
+    rng = random.Random(1337)
+    glyphs = "0123456789ABCDEFKMNRSXY#/%"
+    cols = []
+    for cx in range(0, W, 5):
+        speed = rng.choice([1, 1, 2])  # screen heights per loop
+        cols.append((cx, rng.randrange(H), speed, rng.randint(6, 22),
+                     [rng.choice(glyphs) for _ in range(60)], rng.random() < 0.12))
+    frames = []
+    for i in range(N):
+        img = Image.new("RGBA", (W, H), rgba(BG))
+        for (cx, y0, speed, ln, chars, red) in cols:
+            head = (y0 + i * H * speed / N) % H
+            for j in range(ln):
+                y = int(head - j * 7) % H
+                t = j / ln
+                base = RED if red else YELLOW
+                c = WHITE if j == 0 else lerp(base, (20, 10, 0), t)
+                ch = chars[(j + (i if j < 2 else 0)) % len(chars)]
+                text(img, cx, y, ch, rgba(c))
+        img = img.convert("RGB")
+        scanlines(img, 0.3)
+        if i in (6, 18):
+            img = bp.glitch(img.convert("RGBA"), random.Random(i), bands=3, max_shift=12).convert("RGB")
+        frames.append(img)
+    save_gif(frames, [80] * N, "bg_datastream.gif")
+
+
+# --------------------------------------------------------------------------
+# Background: neon hex tunnel rushing towards the viewer
+# --------------------------------------------------------------------------
+def build_bg_tunnel():
+    W, H, N = 480, 270, 24
+    cx, cy = W / 2, H / 2
+    frames = []
+    rings = 14
+    for i in range(N):
+        img = Image.new("RGB", (W, H), BG)
+        px = img.load()
+        # spokes
+        for s in range(6):
+            ang = s * math.pi / 3 + math.pi / 6
+            for r in range(6, 320):
+                x, y = int(cx + r * math.cos(ang)), int(cy + r * math.sin(ang))
+                if 0 <= x < W and 0 <= y < H:
+                    px[x, y] = lerp(BG, (90, 0, 30), min(1.0, r / 200))
+        for k in range(rings):
+            # exponential spacing; one ring step per loop keeps it seamless
+            d = (k + i / N) / rings
+            r = 4 * math.exp(d * 4.4)
+            col = YELLOW if k % 3 else RED
+            bright = min(1.0, d * 1.6)
+            c = lerp(BG, col, bright)
+            for e in range(6):
+                a0 = e * math.pi / 3 + (k % 2) * 0.0
+                a1 = a0 + math.pi / 3
+                p0 = (cx + r * math.cos(a0), cy + r * math.sin(a0))
+                p1 = (cx + r * math.cos(a1), cy + r * math.sin(a1))
+                steps = int(r * 1.2) + 2
+                for t in range(steps):
+                    x = int(p0[0] + (p1[0] - p0[0]) * t / steps)
+                    y = int(p0[1] + (p1[1] - p0[1]) * t / steps)
+                    if 0 <= x < W and 0 <= y < H:
+                        px[x, y] = c
+                        if r > 60 and y + 1 < H:
+                            px[x, y + 1] = c
+        # core glow
+        for y in range(int(cy) - 10, int(cy) + 10):
+            for x in range(int(cx) - 10, int(cx) + 10):
+                d = math.hypot(x - cx, y - cy)
+                if d < 10:
+                    px[x, y] = lerp(px[x, y], WHITE, (1 - d / 10) * (0.6 + 0.4 * math.sin(i / N * 2 * math.pi) ** 2))
+        scanlines(img)
+        if i == 17:
+            img = bp.glitch(img.convert("RGBA"), random.Random(i), bands=4, max_shift=10).convert("RGB")
+        frames.append(img)
+    save_gif(frames, [60] * N, "bg_tunnel.gif")
+
+
+# --------------------------------------------------------------------------
+# Loading screen background: dark grid with a sweeping scan bar
+# --------------------------------------------------------------------------
+def build_bg_boot():
+    W, H, N = 480, 270, 30
+    frames = []
+    for i in range(N):
+        img = Image.new("RGB", (W, H), BG)
+        px = img.load()
+        for y in range(H):
+            for x in range(W):
+                if x % 24 == 0 or y % 24 == 0:
+                    px[x, y] = (24, 22, 14)
+        sweep = int(H * i / N)
+        for d in range(40):
+            y = sweep - d
+            if 0 <= y < H:
+                k = (1 - d / 40) ** 2 * 0.35
+                for x in range(W):
+                    px[x, y] = lerp(px[x, y], YELLOW, k)
+        for x in range(W):
+            if 0 <= sweep < H:
+                px[x, sweep] = lerp(px[x, sweep], YELLOW, 0.6)
+        scanlines(img, 0.3)
+        frames.append(img)
+    save_gif(frames, [60] * N, "bg_boot.gif")
+
+
+# --------------------------------------------------------------------------
+# Spinner and screen transition parts
+# --------------------------------------------------------------------------
+def build_spinner():
+    S, N = 16, 12
+    frames = []
+    for i in range(N):
+        img = new(S, S)
+        for seg in range(12):
+            ang = seg / 12 * 2 * math.pi
+            age = (i - seg) % 12
+            if age > 6:
+                continue
+            c = rgba(lerp(YELLOW, RED, age / 6), int(255 * (1 - age / 7)))
+            for r in (5, 6, 7):
+                x, y = int(round(7.5 + r * math.cos(ang))), int(round(7.5 + r * math.sin(ang)))
+                img.putpixel((x, y), c)
+        frames.append(img)
+    save_apng(frames, [50] * N, "spinner.apng")
+
+
+def build_transition_parts():
+    body = Image.new("RGBA", (16, 16), rgba(BG))
+    for y in range(0, 16, 2):
+        for x in range(16):
+            body.putpixel((x, y), rgba(BLACK))
+    body.putpixel((0, 1), rgba(lerp(BG, YELLOW, 0.3)))
+    body.save(os.path.join(ASSETS, "shutter_body.png"), optimize=True)
+
+    frames = []
+    rng = random.Random(3)
+    for i in range(6):
+        img = new(64, 6)
+        for x in range(64):
+            img.putpixel((x, 0), rgba(RED, 120))
+            img.putpixel((x, 1), rgba(RED))
+            img.putpixel((x, 2), rgba(YELLOW))
+            img.putpixel((x, 3), rgba(YELLOW))
+            img.putpixel((x, 4), rgba(YELLOW, 150))
+            img.putpixel((x, 5), rgba(YELLOW, 60))
+        for _ in range(5):
+            x = rng.randrange(60)
+            for d in range(rng.randint(2, 6)):
+                img.putpixel(((x + d) % 64, 2), rgba(CYAN if i % 2 else WHITE))
+        frames.append(img)
+    save_apng(frames, [40] * 6, "shutter_edge.apng")
 
 
 # --------------------------------------------------------------------------
@@ -337,30 +564,109 @@ def slide_in(ident, target, delay_ms, distance=-240, duration_ms=520, steps=10):
     return p
 
 
-def build_layout(logo_size, panel_size):
-    parts = ["type = fancymenu_layout", ""]
-    parts.append(container("layout-meta", {
-        "identifier": "title_screen",
+def layout_meta(identifier, random_group=None, extra=None):
+    m = {
+        "identifier": identifier,
         "render_custom_elements_behind_vanilla": "false",
         "last_edited_time": "0",
         "is_enabled": "true",
-        "randommode": "false",
-        "randomgroup": "1",
+        "randommode": "true" if random_group else "false",
+        "randomgroup": random_group or "1",
         "randomonlyfirsttime": "false",
         "layout_index": "0",
-    }))
-    parts.append(container("menu_background", {
-        "background_type": "image",
-        "instance_identifier": "cyber_ui_background",
-        "image_path": ASSET_REF + "background.gif",
-        "slide": "false",
-        "repeat_texture": "false",
-        "parallax": "true",
-        "parallax_intensity": "0.015",
-        "invert_parallax": "false",
-        "restart_animated_on_menu_load": "false",
-    }))
-    parts.append(container("customization", {"action": "backgroundoptions", "keepaspectratio": "true"}))
+    }
+    m.update(extra or {})
+    return container("layout-meta", m)
+
+
+TITLE_BACKGROUNDS = ["bg_city.gif", "bg_synthwave.gif", "bg_datastream.gif", "bg_tunnel.gif"]
+
+
+def build_background_layouts():
+    """One small layout per background; FancyMenu picks one of the random
+    group at random every time the title screen opens."""
+    paths = []
+    for name in TITLE_BACKGROUNDS:
+        key = name[:-4]
+        parts = ["type = fancymenu_layout", "", layout_meta("title_screen", random_group="cyber_ui_backgrounds")]
+        parts.append(container("menu_background", {
+            "background_type": "image",
+            "instance_identifier": "cyber_ui_" + key,
+            "image_path": ASSET_REF + name,
+            "slide": "false",
+            "repeat_texture": "false",
+            "parallax": "true",
+            "parallax_intensity": "0.015",
+            "invert_parallax": "false",
+            "restart_animated_on_menu_load": "false",
+        }))
+        parts.append(container("customization", {"action": "backgroundoptions", "keepaspectratio": "true"}))
+        paths.append(write_layout("cyber_ui_title_%s.txt" % key, parts))
+    return paths
+
+
+def keyframe(ident, n, t, x, y):
+    return {"timestamp": int(t), "posOffsetX": int(round(x)), "posOffsetY": int(round(y)), "baseWidth": 0,
+            "baseHeight": 0, "anchorPoint": {"name": "top-left"}, "stickyAnchor": False,
+            "uniqueIdentifier": "%s_k%d" % (ident, n)}
+
+
+def controller(ident, target, keys):
+    p = base_element("animation_controller", ident, "top-left", 0, 0, 1, 1)
+    p.update({
+        "target_element_ids": json.dumps([target]),
+        "keyframes": json.dumps(keys, separators=(",", ":")),
+        "loop": "false",
+        "offset_mode": "true",
+        "ignore_size": "true",
+        "ignore_position": "false",
+    })
+    return p
+
+
+# Menu screens that get the shutter transition (never in-game containers)
+TRANSITION_SCREENS = [
+    "title_screen", "options_screen", "options_sub_screen", "video_settings_screen", "sound_options_screen",
+    "controls_screen", "key_binds_screen", "mouse_settings_screen", "language_select_screen",
+    "pack_selection_screen", "skin_customization_screen", "online_options_screen", "chat_options_screen",
+    "accessibility_options_screen", "telemetry_info_screen", "credits_and_attribution_screen",
+    "select_world_screen", "create_world_screen", "edit_world_screen", "edit_game_rules_screen",
+    "experiments_screen", "join_multiplayer_screen", "direct_join_server_screen", "edit_server_screen",
+    "realms_main_screen", "pause_screen", "stats_screen", "advancements_screen", "share_to_lan_screen",
+    "social_interactions_screen",
+]
+
+
+def build_transition_layout():
+    """Universal layout: a scanline shutter covers the screen when it opens and
+    slides up, its glowing edge sweeping across the menu."""
+    parts = ["type = fancymenu_layout", "", layout_meta(
+        "%fancymenu:universal_layout%",
+        extra={"universal_layout_whitelist": ";".join(TRANSITION_SCREENS) + ";",
+               "universal_layout_blacklist": "", "layout_index": "100"})]
+    # Elements rest far off-screen (where they snap back once the animation
+    # ends) and are moved over the screen only by the animation keyframes.
+    rest_y, body_h, cover_y, travel = -9000, 1200, -100, 1220
+    hold, dur, steps = 90, 620, 14
+    for ident, src, h, repeat, dy0 in (("cyber_ui_shutter_body", "shutter_body.png", body_h, "true", 0),
+                                      ("cyber_ui_shutter_edge", "shutter_edge.apng", 6, "true", body_h)):
+        parts.append(container("element", base_element(
+            "image", ident, "top-left", -1000, rest_y + dy0, 4000, h,
+            source=ASSET_REF + src, repeat_texture=repeat, nine_slice_texture="false",
+            nine_slice_texture_border_x="5", nine_slice_texture_border_y="5", image_tint="#FFFFFF",
+            restart_animated_on_menu_load="true")))
+        cover = cover_y - rest_y
+        keys = [keyframe(ident, 0, 0, 0, cover), keyframe(ident, 1, hold, 0, cover)]
+        for s in range(1, steps + 1):
+            t = s / steps
+            ease = 1 - (1 - t) ** 3
+            keys.append(keyframe(ident, s + 1, hold + dur * t, 0, cover - travel * ease))
+        parts.append(container("element", controller(ident + "_anim", ident, keys)))
+    return write_layout("cyber_ui_transition.txt", parts)
+
+
+def build_layout(logo_size, panel_size):
+    parts = ["type = fancymenu_layout", "", layout_meta("title_screen")]
 
     lw = 230
     lh = int(logo_size[1] * lw / logo_size[0])
@@ -481,6 +787,12 @@ def build_loading_layout(logo_size, boot_size):
         "instance_identifier": "cyber_ui_loading_background",
         "color": "#0A0A0F",
     }))
+    # animated grid with a sweeping scan bar, stretched over the whole screen
+    parts.append(container("element", base_element(
+        "image", "cyber_ui_loading_grid", "top-left", 0, 0, "%guiwidth%", "%guiheight%",
+        source=ASSET_REF + "bg_boot.gif", repeat_texture="false", nine_slice_texture="false",
+        nine_slice_texture_border_x="5", nine_slice_texture_border_y="5", image_tint="#FFFFFF",
+        restart_animated_on_menu_load="false")))
 
     lw = 260
     lh = int(logo_size[1] * lw / logo_size[0])
@@ -489,6 +801,23 @@ def build_loading_layout(logo_size, boot_size):
         sticky_anchor="true", source=ASSET_REF + "logo.apng", repeat_texture="false",
         nine_slice_texture="false", nine_slice_texture_border_x="5", nine_slice_texture_border_y="5",
         image_tint="#FFFFFF", restart_animated_on_menu_load="true")))
+    # the logo drops in from above with an ease-out
+    keys = [keyframe("cyber_ui_loading_logo_anim", 0, 0, 0, -160)]
+    for n in range(1, 13):
+        t = n / 12
+        keys.append(keyframe("cyber_ui_loading_logo_anim", n, 700 * t, 0, -160 * (1 - t) ** 3))
+    parts.append(container("element", controller("cyber_ui_loading_logo_anim", "cyber_ui_loading_logo", keys)))
+
+    parts.append(container("element", base_element(
+        "image", "cyber_ui_loading_spinner", "mid-centered", -112, 22, 16, 16,
+        sticky_anchor="true", source=ASSET_REF + "spinner.apng", repeat_texture="false",
+        nine_slice_texture="false", nine_slice_texture_border_x="5", nine_slice_texture_border_y="5",
+        image_tint="#FFFFFF", restart_animated_on_menu_load="false")))
+    parts.append(container("element", base_element(
+        "text_v2", "cyber_ui_loading_percent", "mid-centered", 104, 18, 40, 10,
+        source='{"placeholder":"game_loading_progress"}%', source_mode="direct", shadow="false",
+        scale="1.0", base_color="#FCEE0A", text_border="0", line_spacing="1", enable_scrolling="false",
+        auto_line_wrapping="false", interactable="false")))
 
     parts.append(container("element", base_element(
         "progress_bar", "cyber_ui_loading_bar", "mid-centered", 0, 22, 200, 8,
@@ -521,10 +850,19 @@ def build_loading_layout(logo_size, boot_size):
 
 def main():
     build_background()
+    build_bg_synthwave()
+    build_bg_datastream()
+    build_bg_tunnel()
+    build_bg_boot()
     logo_size = build_logo()
     panel_size = build_status_panel()
     build_hazard_strip()
+    build_spinner()
+    build_transition_parts()
     print(build_layout(logo_size, panel_size))
+    for path in build_background_layouts():
+        print(path)
+    print(build_transition_layout())
     boot_size = build_boot_text()
     build_progress_textures()
     print(build_loading_layout(logo_size, boot_size))

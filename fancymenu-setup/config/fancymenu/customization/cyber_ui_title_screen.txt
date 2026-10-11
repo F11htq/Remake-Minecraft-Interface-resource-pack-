@@ -13,23 +13,6 @@ layout-meta {
   layout_index = 0
 }
 
-menu_background {
-  background_type = image
-  instance_identifier = cyber_ui_background
-  image_path = [source:local]/config/fancymenu/assets/cyber_ui/background.gif
-  slide = false
-  repeat_texture = false
-  parallax = true
-  parallax_intensity = 0.015
-  invert_parallax = false
-  restart_animated_on_menu_load = false
-}
-
-customization {
-  action = backgroundoptions
-  keepaspectratio = true
-}
-
 element {
   element_type = image
   instance_identifier = cyber_ui_logo
