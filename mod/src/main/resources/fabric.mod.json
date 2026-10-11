@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "cyberui",
+  "version": "${version}",
+  "name": "CYBER//UI",
+  "description": "Cyberpunk title screen and loading screen: left-aligned animated buttons, random colour-graded panoramas, SYS//STAT panel, screen transitions and a custom loading screen. Pairs with the CYBER//UI resource pack.",
+  "authors": ["f11htq"],
+  "contact": {
+    "sources": "https://github.com/f11htq/remake-minecraft-interface-resource-pack-"
+  },
+  "license": "MIT",
+  "icon": "assets/cyberui/icon.png",
+  "environment": "client",
+  "mixins": ["cyberui.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.4",
+    "java": ">=21"
+  }
+}
