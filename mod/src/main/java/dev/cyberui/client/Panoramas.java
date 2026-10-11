@@ -16,17 +16,17 @@ public final class Panoramas {
         "ocean", "village", "bees", "nether", "caves", "peaks", "swamp", "cherry", "trial_chambers", "pale_garden",
     };
     private static final String VANILLA_PATH = "textures/gui/title/background/panorama";
-    private static final List<ResourceLocation[]> CUBE_MAPS = new ArrayList<>();
+    private static final List<CubeMapAccess> CUBE_MAPS = new ArrayList<>();
     private static final Random RANDOM = new Random();
     private static int last = -1;
 
     private Panoramas() {
     }
 
-    /** Called when a CubeMap is created; keeps the title panorama's face array. */
-    public static void track(ResourceLocation base, ResourceLocation[] faces) {
+    /** Called when a CubeMap is created; keeps the title panorama. */
+    public static void track(ResourceLocation base, CubeMapAccess cubeMap) {
         if (base != null && VANILLA_PATH.equals(base.getPath())) {
-            CUBE_MAPS.add(faces);
+            CUBE_MAPS.add(cubeMap);
         }
     }
 
@@ -40,11 +40,14 @@ public final class Panoramas {
             pick = (pick + 1 + RANDOM.nextInt(NAMES.length - 1)) % NAMES.length;
         }
         last = pick;
-        for (ResourceLocation[] faces : CUBE_MAPS) {
-            for (int i = 0; i < faces.length; i++) {
-                faces[i] = ResourceLocation.fromNamespaceAndPath(
-                        "cyberui", "textures/gui/panorama/" + NAMES[pick] + "/panorama_" + i + ".png");
-            }
+        List<ResourceLocation> sides = new ArrayList<>(6);
+        for (int i = 0; i < 6; i++) {
+            sides.add(ResourceLocation.fromNamespaceAndPath(
+                    "cyberui", "textures/gui/panorama/" + NAMES[pick] + "/panorama_" + i + ".png"));
+        }
+        List<ResourceLocation> faces = List.copyOf(sides);
+        for (CubeMapAccess cubeMap : CUBE_MAPS) {
+            cubeMap.cyberui$setSides(faces);
         }
     }
 }

@@ -29,18 +29,18 @@ jobs:
         working-directory: mod
         run: gradle build --stacktrace
 
-      - name: Dump Minecraft signatures (debug)
+      - name: Check Minecraft signatures used by mixins
         if: always()
         run: |
-          JAR=$(find ~/.gradle/caches/fabric-loom mod/.gradle -name "minecraft-*1.21.4*.jar" 2>/dev/null | grep -v sources | grep -iE "merged|client|common" | head -n 1)
-          echo "jar: $JAR"
-          for c in net.minecraft.client.renderer.CubeMap \
-                   net.minecraft.client.gui.components.LogoRenderer \
-                   net.minecraft.client.gui.components.SplashRenderer \
-                   net.minecraft.client.gui.screens.LoadingOverlay \
-                   net.minecraft.client.gui.screens.TitleScreen; do
-            javap -p -s -cp "$JAR" "$c" || true
-          done
+          JAR=$(find ~/.gradle/caches/fabric-loom -name "minecraft-merged-*1.21.4*.jar" | grep -v sources | head -n 1)
+          check() { javap -p -cp "$JAR" "$1" | grep -E "$2" || echo "MISSING in $1: $2"; }
+          check net.minecraft.client.gui.screens.Screen "renderWithTooltip"
+          check net.minecraft.client.Minecraft "void setScreen|Screen screen;"
+          check net.minecraft.client.gui.GuiGraphics "void (blit|fill)\\("
+          check net.minecraft.client.renderer.CubeMap "sides"
+          check net.minecraft.client.renderer.texture.TextureManager "register|getTexture"
+          check net.minecraft.client.renderer.texture.DynamicTexture "DynamicTexture\\("
+          check net.minecraft.client.gui.components.AbstractWidget "setWidth|getMessage"
 
       - name: Upload jar
         uses: actions/upload-artifact@v4
