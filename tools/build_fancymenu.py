@@ -55,9 +55,25 @@ def text(img, x, y, s, c):
     return x
 
 
+def full_frames(frames):
+    """Pillow stores APNG frames as the changed region only; FancyMenu draws
+    every frame on its own, so partial frames show up cut off. Flipping the
+    lowest bit of two opposite corner pixels makes every frame differ over the
+    full canvas, which forces Pillow to store complete frames."""
+    out = []
+    for i, f in enumerate(frames):
+        f = f.copy()
+        for x, y in ((0, 0), (f.width - 1, f.height - 1)):
+            r, g, b, a = f.getpixel((x, y))
+            f.putpixel((x, y), ((r & ~1) | (i % 2), g, b, a))
+        out.append(f)
+    return out
+
+
 def save_apng(frames, durations, name):
     os.makedirs(ASSETS, exist_ok=True)
     path = os.path.join(ASSETS, name)
+    frames = full_frames([f.convert("RGBA") for f in frames])
     frames[0].save(path, format="PNG", save_all=True, append_images=frames[1:],
                    duration=durations, loop=0, disposal=0, blend=0, optimize=True)
     return path
@@ -452,7 +468,7 @@ def build_customizable_menus():
 def build_layout(logo_size, panel_size):
     parts = ["type = fancymenu_layout", "", layout_meta("title_screen")]
 
-    lw = 230
+    lw = 210
     lh = int(logo_size[1] * lw / logo_size[0])
     parts.append(container("element", base_element(
         "image", "cyber_ui_logo", "top-left", 18, 14, lw, lh,
@@ -477,25 +493,30 @@ def build_layout(logo_size, panel_size):
 
     # vanilla buttons in a left-aligned column, sliding in one after another
     column = [
-        ("mc_titlescreen_singleplayer_button", -34),
-        ("mc_titlescreen_multiplayer_button", -10),
-        ("mc_titlescreen_realms_button", 14),
-        ("mc_titlescreen_options_button", 44),
-        ("mc_titlescreen_quit_button", 68),
+        ("mc_titlescreen_singleplayer_button", -46),
+        ("mc_titlescreen_multiplayer_button", -22),
+        ("mc_titlescreen_realms_button", 2),
+        ("modmenu_titlescreen_mods_button", 26),  # only with Mod Menu installed
+        ("mc_titlescreen_options_button", 56),
+        ("mc_titlescreen_quit_button", 80),
     ]
     for n, (ident, y) in enumerate(column):
         parts.append(container("vanilla_button", base_element(
             "vanilla_button", ident, "mid-left", 18, y, 160, 20,
             is_hidden="false", automated_button_clicks="0")))
         parts.append(container("element", slide_in(ident + "_anim", ident, 120 + n * 90)))
-    for ident, y in (("mc_titlescreen_language_button", 44), ("mc_titlescreen_accessibility_button", 68)):
+    # The language and accessibility icon buttons have no named identifier in
+    # FancyMenu 3.7 on 1.21.4, so they are addressed by FancyMenu's fallback id:
+    # their x/y on a virtual 1000x1000 screen (x = 376 / 604, y = 382, or 406
+    # when Mod Menu adds its row). Ids that do not exist are simply ignored.
+    for ident, y in (("376382", 56), ("376406", 56), ("604382", 80), ("604406", 80)):
         parts.append(container("vanilla_button", base_element(
             "vanilla_button", ident, "mid-left", 182, y, 20, 20,
             is_hidden="false", automated_button_clicks="0")))
-        parts.append(container("element", slide_in(ident + "_anim", ident, 120 + 5 * 90)))
+        parts.append(container("element", slide_in("cyber_ui_icon_%s_anim" % ident, ident, 120 + 6 * 90)))
     # demo button (only exists in demo mode) takes the singleplayer slot
     parts.append(container("vanilla_button", base_element(
-        "vanilla_button", "mc_titlescreen_playdemo_button", "mid-left", 18, -34, 160, 20,
+        "vanilla_button", "mc_titlescreen_playdemo_button", "mid-left", 18, -46, 160, 20,
         is_hidden="false", automated_button_clicks="0")))
 
     # vanilla logo and splash are replaced by the animated logo

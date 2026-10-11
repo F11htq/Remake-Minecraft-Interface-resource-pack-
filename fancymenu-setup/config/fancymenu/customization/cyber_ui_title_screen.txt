@@ -26,8 +26,8 @@ element {
   anchor_point = top-left
   x = 18
   y = 14
-  width = 230
-  height = 48
+  width = 210
+  height = 44
   stretch_x = false
   stretch_y = false
   stay_on_screen = false
@@ -156,7 +156,7 @@ vanilla_button {
   base_opacity = 1.0
   anchor_point = mid-left
   x = 18
-  y = -34
+  y = -46
   width = 160
   height = 20
   stretch_x = false
@@ -216,7 +216,7 @@ vanilla_button {
   base_opacity = 1.0
   anchor_point = mid-left
   x = 18
-  y = -10
+  y = -22
   width = 160
   height = 20
   stretch_x = false
@@ -276,7 +276,7 @@ vanilla_button {
   base_opacity = 1.0
   anchor_point = mid-left
   x = 18
-  y = 14
+  y = 2
   width = 160
   height = 20
   stretch_x = false
@@ -326,6 +326,66 @@ element {
 
 vanilla_button {
   element_type = vanilla_button
+  instance_identifier = modmenu_titlescreen_mods_button
+  appearance_delay = no_delay
+  appearance_delay_seconds = 1.0
+  fade_in_v2 = no_fading
+  fade_in_speed = 1.0
+  fade_out = no_fading
+  fade_out_speed = 1.0
+  base_opacity = 1.0
+  anchor_point = mid-left
+  x = 18
+  y = 26
+  width = 160
+  height = 20
+  stretch_x = false
+  stretch_y = false
+  stay_on_screen = false
+  element_loading_requirement_container_identifier = modmenu_titlescreen_mods_button_req
+  enable_parallax = false
+  parallax_intensity_v2 = 0.5
+  invert_parallax = false
+  load_once_per_session = false
+  layer_hidden_in_editor = false
+  is_hidden = false
+  automated_button_clicks = 0
+}
+
+element {
+  element_type = animation_controller
+  instance_identifier = modmenu_titlescreen_mods_button_anim
+  appearance_delay = no_delay
+  appearance_delay_seconds = 1.0
+  fade_in_v2 = no_fading
+  fade_in_speed = 1.0
+  fade_out = no_fading
+  fade_out_speed = 1.0
+  base_opacity = 1.0
+  anchor_point = top-left
+  x = 0
+  y = 0
+  width = 1
+  height = 1
+  stretch_x = false
+  stretch_y = false
+  stay_on_screen = false
+  element_loading_requirement_container_identifier = modmenu_titlescreen_mods_button_anim_req
+  enable_parallax = false
+  parallax_intensity_v2 = 0.5
+  invert_parallax = false
+  load_once_per_session = false
+  layer_hidden_in_editor = false
+  target_element_ids = ["modmenu_titlescreen_mods_button"]
+  keyframes = [{"timestamp":0,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"modmenu_titlescreen_mods_button_anim_k0"},{"timestamp":390,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"modmenu_titlescreen_mods_button_anim_kd"},{"timestamp":442,"posOffsetX":-175,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"modmenu_titlescreen_mods_button_anim_k1"},{"timestamp":494,"posOffsetX":-123,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"modmenu_titlescreen_mods_button_anim_k2"},{"timestamp":546,"posOffsetX":-82,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"modmenu_titlescreen_mods_button_anim_k3"},{"timestamp":598,"posOffsetX":-52,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"modmenu_titlescreen_mods_button_anim_k4"},{"timestamp":650,"posOffsetX":-30,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"modmenu_titlescreen_mods_button_anim_k5"},{"timestamp":702,"posOffsetX":-15,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"modmenu_titlescreen_mods_button_anim_k6"},{"timestamp":754,"posOffsetX":-6,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"modmenu_titlescreen_mods_button_anim_k7"},{"timestamp":806,"posOffsetX":-2,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"modmenu_titlescreen_mods_button_anim_k8"},{"timestamp":858,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"modmenu_titlescreen_mods_button_anim_k9"},{"timestamp":910,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"modmenu_titlescreen_mods_button_anim_k10"}]
+  loop = false
+  offset_mode = true
+  ignore_size = true
+  ignore_position = false
+}
+
+vanilla_button {
+  element_type = vanilla_button
   instance_identifier = mc_titlescreen_options_button
   appearance_delay = no_delay
   appearance_delay_seconds = 1.0
@@ -336,7 +396,7 @@ vanilla_button {
   base_opacity = 1.0
   anchor_point = mid-left
   x = 18
-  y = 44
+  y = 56
   width = 160
   height = 20
   stretch_x = false
@@ -377,7 +437,7 @@ element {
   load_once_per_session = false
   layer_hidden_in_editor = false
   target_element_ids = ["mc_titlescreen_options_button"]
-  keyframes = [{"timestamp":0,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k0"},{"timestamp":390,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_kd"},{"timestamp":442,"posOffsetX":-175,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k1"},{"timestamp":494,"posOffsetX":-123,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k2"},{"timestamp":546,"posOffsetX":-82,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k3"},{"timestamp":598,"posOffsetX":-52,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k4"},{"timestamp":650,"posOffsetX":-30,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k5"},{"timestamp":702,"posOffsetX":-15,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k6"},{"timestamp":754,"posOffsetX":-6,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k7"},{"timestamp":806,"posOffsetX":-2,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k8"},{"timestamp":858,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k9"},{"timestamp":910,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k10"}]
+  keyframes = [{"timestamp":0,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k0"},{"timestamp":480,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_kd"},{"timestamp":532,"posOffsetX":-175,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k1"},{"timestamp":584,"posOffsetX":-123,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k2"},{"timestamp":636,"posOffsetX":-82,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k3"},{"timestamp":688,"posOffsetX":-52,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k4"},{"timestamp":740,"posOffsetX":-30,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k5"},{"timestamp":792,"posOffsetX":-15,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k6"},{"timestamp":844,"posOffsetX":-6,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k7"},{"timestamp":896,"posOffsetX":-2,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k8"},{"timestamp":948,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k9"},{"timestamp":1000,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_options_button_anim_k10"}]
   loop = false
   offset_mode = true
   ignore_size = true
@@ -396,7 +456,7 @@ vanilla_button {
   base_opacity = 1.0
   anchor_point = mid-left
   x = 18
-  y = 68
+  y = 80
   width = 160
   height = 20
   stretch_x = false
@@ -437,7 +497,7 @@ element {
   load_once_per_session = false
   layer_hidden_in_editor = false
   target_element_ids = ["mc_titlescreen_quit_button"]
-  keyframes = [{"timestamp":0,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k0"},{"timestamp":480,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_kd"},{"timestamp":532,"posOffsetX":-175,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k1"},{"timestamp":584,"posOffsetX":-123,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k2"},{"timestamp":636,"posOffsetX":-82,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k3"},{"timestamp":688,"posOffsetX":-52,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k4"},{"timestamp":740,"posOffsetX":-30,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k5"},{"timestamp":792,"posOffsetX":-15,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k6"},{"timestamp":844,"posOffsetX":-6,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k7"},{"timestamp":896,"posOffsetX":-2,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k8"},{"timestamp":948,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k9"},{"timestamp":1000,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k10"}]
+  keyframes = [{"timestamp":0,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k0"},{"timestamp":570,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_kd"},{"timestamp":622,"posOffsetX":-175,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k1"},{"timestamp":674,"posOffsetX":-123,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k2"},{"timestamp":726,"posOffsetX":-82,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k3"},{"timestamp":778,"posOffsetX":-52,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k4"},{"timestamp":830,"posOffsetX":-30,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k5"},{"timestamp":882,"posOffsetX":-15,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k6"},{"timestamp":934,"posOffsetX":-6,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k7"},{"timestamp":986,"posOffsetX":-2,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k8"},{"timestamp":1038,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k9"},{"timestamp":1090,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_quit_button_anim_k10"}]
   loop = false
   offset_mode = true
   ignore_size = true
@@ -446,7 +506,7 @@ element {
 
 vanilla_button {
   element_type = vanilla_button
-  instance_identifier = mc_titlescreen_language_button
+  instance_identifier = 376382
   appearance_delay = no_delay
   appearance_delay_seconds = 1.0
   fade_in_v2 = no_fading
@@ -456,13 +516,13 @@ vanilla_button {
   base_opacity = 1.0
   anchor_point = mid-left
   x = 182
-  y = 44
+  y = 56
   width = 20
   height = 20
   stretch_x = false
   stretch_y = false
   stay_on_screen = false
-  element_loading_requirement_container_identifier = mc_titlescreen_language_button_req
+  element_loading_requirement_container_identifier = 376382_req
   enable_parallax = false
   parallax_intensity_v2 = 0.5
   invert_parallax = false
@@ -474,7 +534,7 @@ vanilla_button {
 
 element {
   element_type = animation_controller
-  instance_identifier = mc_titlescreen_language_button_anim
+  instance_identifier = cyber_ui_icon_376382_anim
   appearance_delay = no_delay
   appearance_delay_seconds = 1.0
   fade_in_v2 = no_fading
@@ -490,14 +550,14 @@ element {
   stretch_x = false
   stretch_y = false
   stay_on_screen = false
-  element_loading_requirement_container_identifier = mc_titlescreen_language_button_anim_req
+  element_loading_requirement_container_identifier = cyber_ui_icon_376382_anim_req
   enable_parallax = false
   parallax_intensity_v2 = 0.5
   invert_parallax = false
   load_once_per_session = false
   layer_hidden_in_editor = false
-  target_element_ids = ["mc_titlescreen_language_button"]
-  keyframes = [{"timestamp":0,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_language_button_anim_k0"},{"timestamp":570,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_language_button_anim_kd"},{"timestamp":622,"posOffsetX":-175,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_language_button_anim_k1"},{"timestamp":674,"posOffsetX":-123,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_language_button_anim_k2"},{"timestamp":726,"posOffsetX":-82,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_language_button_anim_k3"},{"timestamp":778,"posOffsetX":-52,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_language_button_anim_k4"},{"timestamp":830,"posOffsetX":-30,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_language_button_anim_k5"},{"timestamp":882,"posOffsetX":-15,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_language_button_anim_k6"},{"timestamp":934,"posOffsetX":-6,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_language_button_anim_k7"},{"timestamp":986,"posOffsetX":-2,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_language_button_anim_k8"},{"timestamp":1038,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_language_button_anim_k9"},{"timestamp":1090,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_language_button_anim_k10"}]
+  target_element_ids = ["376382"]
+  keyframes = [{"timestamp":0,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376382_anim_k0"},{"timestamp":660,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376382_anim_kd"},{"timestamp":712,"posOffsetX":-175,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376382_anim_k1"},{"timestamp":764,"posOffsetX":-123,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376382_anim_k2"},{"timestamp":816,"posOffsetX":-82,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376382_anim_k3"},{"timestamp":868,"posOffsetX":-52,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376382_anim_k4"},{"timestamp":920,"posOffsetX":-30,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376382_anim_k5"},{"timestamp":972,"posOffsetX":-15,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376382_anim_k6"},{"timestamp":1024,"posOffsetX":-6,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376382_anim_k7"},{"timestamp":1076,"posOffsetX":-2,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376382_anim_k8"},{"timestamp":1128,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376382_anim_k9"},{"timestamp":1180,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376382_anim_k10"}]
   loop = false
   offset_mode = true
   ignore_size = true
@@ -506,7 +566,7 @@ element {
 
 vanilla_button {
   element_type = vanilla_button
-  instance_identifier = mc_titlescreen_accessibility_button
+  instance_identifier = 376406
   appearance_delay = no_delay
   appearance_delay_seconds = 1.0
   fade_in_v2 = no_fading
@@ -516,13 +576,13 @@ vanilla_button {
   base_opacity = 1.0
   anchor_point = mid-left
   x = 182
-  y = 68
+  y = 56
   width = 20
   height = 20
   stretch_x = false
   stretch_y = false
   stay_on_screen = false
-  element_loading_requirement_container_identifier = mc_titlescreen_accessibility_button_req
+  element_loading_requirement_container_identifier = 376406_req
   enable_parallax = false
   parallax_intensity_v2 = 0.5
   invert_parallax = false
@@ -534,7 +594,7 @@ vanilla_button {
 
 element {
   element_type = animation_controller
-  instance_identifier = mc_titlescreen_accessibility_button_anim
+  instance_identifier = cyber_ui_icon_376406_anim
   appearance_delay = no_delay
   appearance_delay_seconds = 1.0
   fade_in_v2 = no_fading
@@ -550,14 +610,134 @@ element {
   stretch_x = false
   stretch_y = false
   stay_on_screen = false
-  element_loading_requirement_container_identifier = mc_titlescreen_accessibility_button_anim_req
+  element_loading_requirement_container_identifier = cyber_ui_icon_376406_anim_req
   enable_parallax = false
   parallax_intensity_v2 = 0.5
   invert_parallax = false
   load_once_per_session = false
   layer_hidden_in_editor = false
-  target_element_ids = ["mc_titlescreen_accessibility_button"]
-  keyframes = [{"timestamp":0,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_accessibility_button_anim_k0"},{"timestamp":570,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_accessibility_button_anim_kd"},{"timestamp":622,"posOffsetX":-175,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_accessibility_button_anim_k1"},{"timestamp":674,"posOffsetX":-123,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_accessibility_button_anim_k2"},{"timestamp":726,"posOffsetX":-82,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_accessibility_button_anim_k3"},{"timestamp":778,"posOffsetX":-52,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_accessibility_button_anim_k4"},{"timestamp":830,"posOffsetX":-30,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_accessibility_button_anim_k5"},{"timestamp":882,"posOffsetX":-15,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_accessibility_button_anim_k6"},{"timestamp":934,"posOffsetX":-6,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_accessibility_button_anim_k7"},{"timestamp":986,"posOffsetX":-2,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_accessibility_button_anim_k8"},{"timestamp":1038,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_accessibility_button_anim_k9"},{"timestamp":1090,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"mc_titlescreen_accessibility_button_anim_k10"}]
+  target_element_ids = ["376406"]
+  keyframes = [{"timestamp":0,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376406_anim_k0"},{"timestamp":660,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376406_anim_kd"},{"timestamp":712,"posOffsetX":-175,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376406_anim_k1"},{"timestamp":764,"posOffsetX":-123,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376406_anim_k2"},{"timestamp":816,"posOffsetX":-82,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376406_anim_k3"},{"timestamp":868,"posOffsetX":-52,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376406_anim_k4"},{"timestamp":920,"posOffsetX":-30,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376406_anim_k5"},{"timestamp":972,"posOffsetX":-15,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376406_anim_k6"},{"timestamp":1024,"posOffsetX":-6,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376406_anim_k7"},{"timestamp":1076,"posOffsetX":-2,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376406_anim_k8"},{"timestamp":1128,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376406_anim_k9"},{"timestamp":1180,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_376406_anim_k10"}]
+  loop = false
+  offset_mode = true
+  ignore_size = true
+  ignore_position = false
+}
+
+vanilla_button {
+  element_type = vanilla_button
+  instance_identifier = 604382
+  appearance_delay = no_delay
+  appearance_delay_seconds = 1.0
+  fade_in_v2 = no_fading
+  fade_in_speed = 1.0
+  fade_out = no_fading
+  fade_out_speed = 1.0
+  base_opacity = 1.0
+  anchor_point = mid-left
+  x = 182
+  y = 80
+  width = 20
+  height = 20
+  stretch_x = false
+  stretch_y = false
+  stay_on_screen = false
+  element_loading_requirement_container_identifier = 604382_req
+  enable_parallax = false
+  parallax_intensity_v2 = 0.5
+  invert_parallax = false
+  load_once_per_session = false
+  layer_hidden_in_editor = false
+  is_hidden = false
+  automated_button_clicks = 0
+}
+
+element {
+  element_type = animation_controller
+  instance_identifier = cyber_ui_icon_604382_anim
+  appearance_delay = no_delay
+  appearance_delay_seconds = 1.0
+  fade_in_v2 = no_fading
+  fade_in_speed = 1.0
+  fade_out = no_fading
+  fade_out_speed = 1.0
+  base_opacity = 1.0
+  anchor_point = top-left
+  x = 0
+  y = 0
+  width = 1
+  height = 1
+  stretch_x = false
+  stretch_y = false
+  stay_on_screen = false
+  element_loading_requirement_container_identifier = cyber_ui_icon_604382_anim_req
+  enable_parallax = false
+  parallax_intensity_v2 = 0.5
+  invert_parallax = false
+  load_once_per_session = false
+  layer_hidden_in_editor = false
+  target_element_ids = ["604382"]
+  keyframes = [{"timestamp":0,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604382_anim_k0"},{"timestamp":660,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604382_anim_kd"},{"timestamp":712,"posOffsetX":-175,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604382_anim_k1"},{"timestamp":764,"posOffsetX":-123,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604382_anim_k2"},{"timestamp":816,"posOffsetX":-82,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604382_anim_k3"},{"timestamp":868,"posOffsetX":-52,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604382_anim_k4"},{"timestamp":920,"posOffsetX":-30,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604382_anim_k5"},{"timestamp":972,"posOffsetX":-15,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604382_anim_k6"},{"timestamp":1024,"posOffsetX":-6,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604382_anim_k7"},{"timestamp":1076,"posOffsetX":-2,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604382_anim_k8"},{"timestamp":1128,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604382_anim_k9"},{"timestamp":1180,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604382_anim_k10"}]
+  loop = false
+  offset_mode = true
+  ignore_size = true
+  ignore_position = false
+}
+
+vanilla_button {
+  element_type = vanilla_button
+  instance_identifier = 604406
+  appearance_delay = no_delay
+  appearance_delay_seconds = 1.0
+  fade_in_v2 = no_fading
+  fade_in_speed = 1.0
+  fade_out = no_fading
+  fade_out_speed = 1.0
+  base_opacity = 1.0
+  anchor_point = mid-left
+  x = 182
+  y = 80
+  width = 20
+  height = 20
+  stretch_x = false
+  stretch_y = false
+  stay_on_screen = false
+  element_loading_requirement_container_identifier = 604406_req
+  enable_parallax = false
+  parallax_intensity_v2 = 0.5
+  invert_parallax = false
+  load_once_per_session = false
+  layer_hidden_in_editor = false
+  is_hidden = false
+  automated_button_clicks = 0
+}
+
+element {
+  element_type = animation_controller
+  instance_identifier = cyber_ui_icon_604406_anim
+  appearance_delay = no_delay
+  appearance_delay_seconds = 1.0
+  fade_in_v2 = no_fading
+  fade_in_speed = 1.0
+  fade_out = no_fading
+  fade_out_speed = 1.0
+  base_opacity = 1.0
+  anchor_point = top-left
+  x = 0
+  y = 0
+  width = 1
+  height = 1
+  stretch_x = false
+  stretch_y = false
+  stay_on_screen = false
+  element_loading_requirement_container_identifier = cyber_ui_icon_604406_anim_req
+  enable_parallax = false
+  parallax_intensity_v2 = 0.5
+  invert_parallax = false
+  load_once_per_session = false
+  layer_hidden_in_editor = false
+  target_element_ids = ["604406"]
+  keyframes = [{"timestamp":0,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604406_anim_k0"},{"timestamp":660,"posOffsetX":-240,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604406_anim_kd"},{"timestamp":712,"posOffsetX":-175,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604406_anim_k1"},{"timestamp":764,"posOffsetX":-123,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604406_anim_k2"},{"timestamp":816,"posOffsetX":-82,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604406_anim_k3"},{"timestamp":868,"posOffsetX":-52,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604406_anim_k4"},{"timestamp":920,"posOffsetX":-30,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604406_anim_k5"},{"timestamp":972,"posOffsetX":-15,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604406_anim_k6"},{"timestamp":1024,"posOffsetX":-6,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604406_anim_k7"},{"timestamp":1076,"posOffsetX":-2,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604406_anim_k8"},{"timestamp":1128,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604406_anim_k9"},{"timestamp":1180,"posOffsetX":0,"posOffsetY":0,"baseWidth":0,"baseHeight":0,"anchorPoint":{"name":"top-left"},"stickyAnchor":false,"uniqueIdentifier":"cyber_ui_icon_604406_anim_k10"}]
   loop = false
   offset_mode = true
   ignore_size = true
@@ -576,7 +756,7 @@ vanilla_button {
   base_opacity = 1.0
   anchor_point = mid-left
   x = 18
-  y = -34
+  y = -46
   width = 160
   height = 20
   stretch_x = false
