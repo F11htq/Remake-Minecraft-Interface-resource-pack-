@@ -1,0 +1,8 @@
+type = panorama
+
+panorama-meta {
+  name = cyber_trial_chambers
+  speed = 0.9
+  fov = 85.0
+  angle = 25.0
+}

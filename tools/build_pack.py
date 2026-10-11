@@ -615,9 +615,9 @@ def build_title(vanilla):
             vig = vig * vig * (3 - 2 * vig)
             glow = max(0.0, (v - 0.7) / 0.3) ** 2
             c = lerp(lerp(BG, RED, glow * 0.5), BLACK, vig * 0.6)
-            a = 60 + 160 * vig + 40 * glow
+            a = 25 + 120 * vig + 35 * glow
             if y % 2 == 0:
-                a += 28
+                a += 16
             ov.putpixel((x, y), rgba(c, int(min(235, a))))
     path = os.path.join(dst, "background", "panorama_overlay.png")
     os.makedirs(os.path.dirname(path), exist_ok=True)
