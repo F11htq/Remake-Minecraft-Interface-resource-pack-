@@ -51,14 +51,14 @@ public abstract class TitleScreenMixin extends Screen {
 
     /** Draw the logo at the left instead of centred. */
     @ModifyArg(method = "render", index = 1, at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/components/LogoRenderer;renderLogo"))
+            target = "Lnet/minecraft/client/gui/components/LogoRenderer;renderLogo(Lnet/minecraft/client/gui/GuiGraphics;IF)V"))
     private int cyberui$logoAtLeft(int screenWidth) {
         return TitleLayout.LOGO_FAKE_WIDTH;
     }
 
     /** Keep the splash text next to the moved logo. */
     @ModifyArg(method = "render", index = 1, at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/components/SplashRenderer;render"))
+            target = "Lnet/minecraft/client/gui/components/SplashRenderer;render(Lnet/minecraft/client/gui/GuiGraphics;ILnet/minecraft/client/gui/Font;I)V"))
     private int cyberui$splashAtLeft(int screenWidth) {
         return TitleLayout.LOGO_FAKE_WIDTH;
     }

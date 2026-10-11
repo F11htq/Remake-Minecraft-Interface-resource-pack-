@@ -29,6 +29,19 @@ jobs:
         working-directory: mod
         run: gradle build --stacktrace
 
+      - name: Dump Minecraft signatures (debug)
+        if: always()
+        run: |
+          JAR=$(find ~/.gradle/caches/fabric-loom mod/.gradle -name "minecraft-*1.21.4*.jar" 2>/dev/null | grep -v sources | grep -iE "merged|client|common" | head -n 1)
+          echo "jar: $JAR"
+          for c in net.minecraft.client.renderer.CubeMap \
+                   net.minecraft.client.gui.components.LogoRenderer \
+                   net.minecraft.client.gui.components.SplashRenderer \
+                   net.minecraft.client.gui.screens.LoadingOverlay \
+                   net.minecraft.client.gui.screens.TitleScreen; do
+            javap -p -s -cp "$JAR" "$c" || true
+          done
+
       - name: Upload jar
         uses: actions/upload-artifact@v4
         with:
