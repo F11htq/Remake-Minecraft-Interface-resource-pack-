@@ -507,9 +507,12 @@ def build_layout(logo_size, panel_size):
         parts.append(container("element", slide_in(ident + "_anim", ident, 120 + n * 90)))
     # The language and accessibility icon buttons have no named identifier in
     # FancyMenu 3.7 on 1.21.4, so they are addressed by FancyMenu's fallback id:
-    # their x/y on a virtual 1000x1000 screen (x = 376 / 604, y = 382, or 406
-    # when Mod Menu adds its row). Ids that do not exist are simply ignored.
-    for ident, y in (("376382", 56), ("376406", 56), ("604382", 80), ("604406", 80)):
+    # "<x><y>" of the button on a virtual 1000x1000 screen (x = 376 / 604). Their
+    # y depends on which mods add rows to the title screen, so every plausible
+    # row is listed; ids that do not exist are ignored by FancyMenu.
+    icon_rows = (382, 394, 406, 418, 430)
+    icons = [("376%d" % y, 56) for y in icon_rows] + [("604%d" % y, 80) for y in icon_rows]
+    for ident, y in icons:
         parts.append(container("vanilla_button", base_element(
             "vanilla_button", ident, "mid-left", 182, y, 20, 20,
             is_hidden="false", automated_button_clicks="0")))
