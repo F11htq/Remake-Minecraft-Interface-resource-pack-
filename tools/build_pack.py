@@ -493,6 +493,66 @@ def build_containers(vanilla):
 
 
 # --------------------------------------------------------------------------
+# Title screen: neon logo and panorama overlay
+# --------------------------------------------------------------------------
+def neon_logo(src, dst, top, bot):
+    img = Image.open(src).convert("RGBA")
+    w, h = img.size
+    bbox = img.getbbox()
+    y0, y1 = bbox[1], bbox[3] - 1
+    px = img.load()
+    for y in range(h):
+        grad = lerp(top, bot, (y - y0) / max(1, y1 - y0))
+        for x in range(w):
+            r, g, b, a = px[x, y]
+            if a == 0:
+                continue
+            lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+            if lum > 0.45:
+                # letter faces: neon gradient, keeping the stone texture as shading
+                k = 0.55 + 0.45 * min(1.0, (lum - 0.45) / 0.4)
+                c = lerp((0, 0, 0), lerp(grad, (255, 255, 255), 0.18), k)
+            elif lum > 0.12:
+                # bevel / letter sides
+                c = lerp((14, 17, 30), grad, 0.22 + 0.3 * (lum - 0.12) / 0.33)
+            else:
+                c = (4, 5, 10)
+            px[x, y] = rgba(c, a)
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    img.save(dst, optimize=True)
+    with open(dst + ".mcmeta", "w") as f:
+        json.dump({"texture": {"blur": True}}, f, indent=2)
+        f.write("\n")
+
+
+def build_title(vanilla):
+    src = os.path.join(vanilla, "title")
+    dst = os.path.join(GUI, "title")
+    neon_logo(os.path.join(src, "minecraft.png"), os.path.join(dst, "minecraft.png"), CYAN, VIOLET)
+    neon_logo(os.path.join(src, "minceraft.png"), os.path.join(dst, "minceraft.png"), CYAN, VIOLET)
+    neon_logo(os.path.join(src, "edition.png"), os.path.join(dst, "edition.png"), VIOLET, PINK)
+
+    # Panorama overlay: stretched over the whole title screen. A dark vignette
+    # with a faint cyan/violet tint keeps the panorama visible in the centre.
+    s = 128
+    ov = new(s, s)
+    for y in range(s):
+        for x in range(s):
+            u, v = x / (s - 1), y / (s - 1)
+            d = math.hypot((u - 0.5) * 1.25, (v - 0.45) * 1.1)
+            vig = max(0.0, min(1.0, (d - 0.25) / 0.5))
+            vig = vig * vig * (3 - 2 * vig)
+            tint = lerp(lerp(CYAN, VIOLET, u), (6, 8, 18), 0.82)
+            ov.putpixel((x, y), rgba(lerp(tint, (4, 5, 12), vig), int(40 + 175 * vig)))
+    path = os.path.join(dst, "background", "panorama_overlay.png")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    ov.save(path, optimize=True)
+    with open(path + ".mcmeta", "w") as f:
+        json.dump({"texture": {"blur": True}}, f, indent=2)
+        f.write("\n")
+
+
+# --------------------------------------------------------------------------
 # Pack icon
 # --------------------------------------------------------------------------
 def build_icon():
@@ -538,6 +598,7 @@ def main():
     build_slot_highlight()
     build_menu_backgrounds()
     n = build_containers(args.vanilla)
+    build_title(args.vanilla)
     build_icon()
     print("built widgets + %d container textures" % n)
 
