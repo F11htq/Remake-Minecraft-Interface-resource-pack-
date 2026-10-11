@@ -406,6 +406,49 @@ def build_transition_layout():
     return write_layout("cyber_ui_transition.txt", parts)
 
 
+# Screens FancyMenu must have customization enabled for (it ignores layouts on
+# all other screens). Class names: Fabric intermediary, then Mojang names
+# (older and 1.21+ packages) for NeoForge/Forge; names that do not exist on the
+# running game are skipped by FancyMenu.
+CUSTOMIZABLE_SCREENS = [
+    "net.minecraft.class_442", "net.minecraft.class_526", "net.minecraft.class_525", "net.minecraft.class_500",
+    "net.minecraft.class_422", "net.minecraft.class_4325", "net.minecraft.class_429", "net.minecraft.class_440",
+    "net.minecraft.class_443", "net.minecraft.class_446", "net.minecraft.class_458", "net.minecraft.class_4288",
+    "net.minecraft.class_426", "net.minecraft.class_404", "net.minecraft.class_5375", "net.minecraft.class_4189",
+    "net.minecraft.class_5235", "net.minecraft.class_457", "net.minecraft.class_447", "net.minecraft.class_433",
+    "net.minecraft.client.gui.screens.TitleScreen",
+    "net.minecraft.client.gui.screens.worldselection.SelectWorldScreen",
+    "net.minecraft.client.gui.screens.worldselection.CreateWorldScreen",
+    "net.minecraft.client.gui.screens.worldselection.EditGameRulesScreen",
+    "net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen",
+    "net.minecraft.client.gui.screens.EditServerScreen",
+    "com.mojang.realmsclient.RealmsMainScreen",
+    "net.minecraft.client.gui.screens.PauseScreen",
+    "net.minecraft.client.gui.screens.advancements.AdvancementsScreen",
+    "net.minecraft.client.gui.screens.achievement.StatsScreen",
+    "net.minecraft.client.gui.screens.packs.PackSelectionScreen",
+    "net.minecraft.client.gui.screens.options.OptionsScreen",
+    "net.minecraft.client.gui.screens.options.SkinCustomizationScreen",
+    "net.minecraft.client.gui.screens.options.SoundOptionsScreen",
+    "net.minecraft.client.gui.screens.options.VideoSettingsScreen",
+    "net.minecraft.client.gui.screens.options.controls.ControlsScreen",
+    "net.minecraft.client.gui.screens.options.MouseSettingsScreen",
+    "net.minecraft.client.gui.screens.options.LanguageSelectScreen",
+    "net.minecraft.client.gui.screens.options.ChatOptionsScreen",
+    "net.minecraft.client.gui.screens.options.AccessibilityOptionsScreen",
+]
+
+
+def build_customizable_menus():
+    lines = ["type = customizablemenus", ""]
+    for cls in CUSTOMIZABLE_SCREENS:
+        lines += ["%s {" % cls, "}", ""]
+    path = os.path.join(OUT, "customizablemenus.txt")
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines))
+    return path
+
+
 def build_layout(logo_size, panel_size):
     parts = ["type = fancymenu_layout", "", layout_meta("title_screen")]
 
@@ -600,6 +643,7 @@ def main():
     for path in build_background_layouts():
         print(path)
     print(build_transition_layout())
+    print(build_customizable_menus())
     boot_size = build_boot_text()
     build_progress_textures()
     print(build_loading_layout(logo_size, boot_size))

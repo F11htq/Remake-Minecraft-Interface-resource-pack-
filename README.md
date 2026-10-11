@@ -85,7 +85,13 @@
 .minecraft/config/fancymenu/customization/cyber_ui_loading_screen.txt
 .minecraft/config/fancymenu/assets/cyber_ui/...
 .minecraft/config/fancymenu/panoramas/cyber_*/...
+.minecraft/config/fancymenu/customizablemenus.txt
 ```
+
+`customizablemenus.txt` включает кастомизацию FancyMenu для главного меню и
+экранов меню: без этого FancyMenu не применяет раскладки. Если меню всё равно
+выглядит по-старому, открой его и в верхней панели FancyMenu выбери
+«Кастомизация → Включить кастомизацию для этого экрана».
 
 Раскладки можно дальше править во встроенном редакторе FancyMenu. Чтобы
 убрать какую-то панораму из случайного выбора, удали её файл `cyber_ui_title_bg_*.txt`. Чтобы
