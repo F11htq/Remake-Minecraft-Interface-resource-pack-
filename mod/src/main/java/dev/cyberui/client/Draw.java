@@ -15,6 +15,7 @@ public final class Draw {
     public static final int RED = 0xFF003C;
     public static final int CYAN = 0x00F0FF;
     public static final int GREY = 0x5A5A64;
+    public static final int SLOT = 0x0B0B10;
 
     private Draw() {
     }

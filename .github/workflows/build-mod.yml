@@ -41,6 +41,9 @@ jobs:
           check net.minecraft.client.renderer.texture.TextureManager "register|getTexture"
           check net.minecraft.client.renderer.texture.DynamicTexture "DynamicTexture\\("
           check net.minecraft.client.gui.components.AbstractWidget "setWidth|getMessage"
+          check net.minecraft.client.gui.screens.inventory.AbstractContainerScreen "renderSlotHighlight|hoveredSlot|leftPos|topPos|imageWidth|imageHeight| render\\(| init\\("
+          check net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen "selectTab|scrollOffs|renderBg| render\\("
+          check net.minecraft.world.inventory.Slot "isHighlightable|isActive"
 
       - name: Upload jar
         uses: actions/upload-artifact@v4
