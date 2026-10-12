@@ -22,6 +22,7 @@ public final class TitleLayout {
     public static final int LOGO_FAKE_WIDTH = 2 * (18 + 128);
 
     private static final int COLUMN_X = 18;
+    private static final int LOGO_BOTTOM = 90;
     private static final int COLUMN_W = 160;
     private static final int ICON_X = COLUMN_X + COLUMN_W + 4;
     private static final int SLIDE_DISTANCE = -240;
@@ -68,9 +69,12 @@ public final class TitleLayout {
                 case "options.language", "narrator.button.language",
                      "options.accessibility", "narrator.button.accessibility" -> icons.add(w);
                 default -> {
-                    // small square buttons left/right of Options and Quit are the icon buttons
                     if (w.getWidth() == 20 && w.getHeight() == 20) {
+                        // small square buttons left/right of Options and Quit are the icon buttons
                         icons.add(w);
+                    } else if (w.getHeight() == 20 && w.getWidth() >= 150) {
+                        // wide buttons added by other mods (e.g. Mod Menu) join the column
+                        column.add(w);
                     }
                 }
             }
@@ -79,8 +83,11 @@ public final class TitleLayout {
         icons.sort(Comparator.comparingInt(AbstractWidget::getX));
 
         List<Placed> placed = new ArrayList<>();
-        int centerY = height / 2;
-        int y = centerY - 46;
+        // start below the logo (logo + edition end at about y = 84) when the screen is short
+        int rows = column.size() + (options != null ? 1 : 0) + (quit != null ? 1 : 0);
+        int total = rows * 24 + 6;
+        int y = Math.max(height / 2 - 46, LOGO_BOTTOM);
+        y = Math.min(y, Math.max(LOGO_BOTTOM - 20, height - 16 - total));
         int n = 0;
         for (AbstractWidget w : column) {
             placed.add(place(w, COLUMN_X, y, COLUMN_W, 120 + n * STAGGER_MS));

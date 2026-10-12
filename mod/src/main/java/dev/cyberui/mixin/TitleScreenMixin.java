@@ -24,6 +24,8 @@ public abstract class TitleScreenMixin extends Screen {
     private List<TitleLayout.Placed> cyberui$placed = new ArrayList<>();
     @Unique
     private long cyberui$openedAt = 0L;
+    @Unique
+    private int cyberui$childCount = -1;
 
     protected TitleScreenMixin(Component title) {
         super(title);
@@ -36,11 +38,21 @@ public abstract class TitleScreenMixin extends Screen {
             this.cyberui$openedAt = Util.getMillis();
             Panoramas.pickRandom();
         }
+        this.cyberui$relayout();
+    }
+
+    @Unique
+    private void cyberui$relayout() {
         this.cyberui$placed = TitleLayout.apply(this.children(), this.width, this.height);
+        this.cyberui$childCount = this.children().size();
     }
 
     @Inject(method = "render", at = @At("HEAD"))
     private void cyberui$animate(GuiGraphics g, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+        // other mods (e.g. Mod Menu) may add buttons after our init hook ran
+        if (this.children().size() != this.cyberui$childCount) {
+            this.cyberui$relayout();
+        }
         TitleLayout.animate(this.cyberui$placed, this.cyberui$openedAt);
     }
 
