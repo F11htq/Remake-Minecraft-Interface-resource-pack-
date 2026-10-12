@@ -3,10 +3,12 @@ package dev.cyberui.mixin;
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.cyberui.client.LogoFx;
 import dev.cyberui.client.Panoramas;
 import dev.cyberui.client.TitleLayout;
 import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
@@ -15,6 +17,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TitleScreen.class)
@@ -61,11 +64,11 @@ public abstract class TitleScreenMixin extends Screen {
         TitleLayout.renderDecor(g, this.width, this.height, this.cyberui$openedAt);
     }
 
-    /** Draw the logo at the left instead of centred. */
-    @ModifyArg(method = "render", index = 1, at = @At(value = "INVOKE",
+    /** Draw the logo at the left, with glow, chromatic split, glitches and an intro. */
+    @Redirect(method = "render", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/gui/components/LogoRenderer;renderLogo(Lnet/minecraft/client/gui/GuiGraphics;IF)V"))
-    private int cyberui$logoAtLeft(int screenWidth) {
-        return TitleLayout.LOGO_FAKE_WIDTH;
+    private void cyberui$logoFx(LogoRenderer logo, GuiGraphics g, int screenWidth, float alpha) {
+        LogoFx.render(logo, g, alpha, this.cyberui$openedAt);
     }
 
     /** Keep the splash text next to the moved logo. */

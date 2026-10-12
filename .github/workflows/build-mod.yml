@@ -44,6 +44,8 @@ jobs:
           check net.minecraft.client.gui.screens.inventory.AbstractContainerScreen "renderSlotHighlight|hoveredSlot|leftPos|topPos|imageWidth|imageHeight| render\\(| init\\("
           check net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen "selectTab|scrollOffs|renderBg| render\\("
           check net.minecraft.world.inventory.Slot "isHighlightable|isActive"
+          check com.mojang.blaze3d.systems.RenderSystem "void setShaderColor"
+          check net.minecraft.client.gui.GuiGraphics "void flush|enableScissor|disableScissor"
 
       - name: Upload jar
         uses: actions/upload-artifact@v4
