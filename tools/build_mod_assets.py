@@ -149,6 +149,25 @@ def build_panoramas(source):
         print("panorama", name)
 
 
+def build_mod_icon():
+    """Pack icon with a red "MOD" plate in the bottom-right corner (128x128)."""
+    icon = Image.open(os.path.join(ROOT, "pack.png")).convert("RGBA").resize((128, 128), Image.NEAREST)
+    small = new(64, 64)
+    small.alpha_composite(icon.resize((64, 64), Image.NEAREST))
+    # plate: black outline, red fill, yellow "MOD" in the 3x5 font at 2x
+    x0, y0, x1, y1 = 33, 48, 62, 61
+    rect(small, x0, y0, x1, y1, rgba(BLACK))
+    rect(small, x0 + 1, y0 + 1, x1 - 1, y1 - 1, rgba(RED))
+    label = new(12, 5)
+    text(label, 0, 0, "MOD", rgba(YELLOW))
+    label = label.resize((24, 10), Image.NEAREST)
+    small.alpha_composite(label, (x0 + 3, y0 + 2))
+    out = small.resize((128, 128), Image.NEAREST)
+    out.save(os.path.join(OUT, "icon.png"), optimize=True)
+    os.makedirs(os.path.join(ROOT, "modrinth"), exist_ok=True)
+    out.resize((512, 512), Image.NEAREST).save(os.path.join(ROOT, "modrinth", "mod-icon.png"), optimize=True)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--panoramas", required=True)
@@ -157,8 +176,7 @@ def main():
     build_hazard()
     build_loading_logo()
     build_panoramas(args.panoramas)
-    icon = os.path.join(OUT, "icon.png")
-    Image.open(os.path.join(ROOT, "pack.png")).save(icon, optimize=True)
+    build_mod_icon()
 
 
 if __name__ == "__main__":
