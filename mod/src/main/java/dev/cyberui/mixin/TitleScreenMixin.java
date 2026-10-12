@@ -37,9 +37,9 @@ public abstract class TitleScreenMixin extends Screen {
     @Inject(method = "init", at = @At("TAIL"))
     private void cyberui$layout(CallbackInfo ci) {
         if (this.cyberui$openedAt == 0L) {
-            // first time this title screen is shown: new panorama, play the slide-in
+            // first time this title screen is shown: play the slide-in
             this.cyberui$openedAt = Util.getMillis();
-            Panoramas.pickRandom();
+            Panoramas.apply();
         }
         this.cyberui$relayout();
     }

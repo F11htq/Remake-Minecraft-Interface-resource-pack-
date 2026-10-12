@@ -25,6 +25,10 @@ loom {
     }
 }
 
+jar {
+    from(rootProject.file("../LICENSE"))
+}
+
 processResources {
     inputs.property "version", project.version
     filesMatching("fabric.mod.json") {

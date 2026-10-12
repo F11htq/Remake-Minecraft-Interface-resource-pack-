@@ -4,8 +4,8 @@
 Usage:
     python3 tools/build_mod_assets.py --panoramas <dir>
 
-<dir> holds one sub-folder per Minecraft version (1.13 ... 1.21.4), each with
-that version's panorama_0..5.png from the client jar. Run tools/build_pack.py
+<dir> holds a sub-folder "1.21.4" with panorama_0..5.png from the 1.21.4
+client jar. Run tools/build_pack.py
 first: the loading-screen logo is made from the pack's re-coloured logo.
 
 Writes into mod/src/main/resources/assets/cyberui/.
@@ -25,11 +25,8 @@ ROOT = bp.ROOT
 OUT = os.path.join(ROOT, "mod", "src", "main", "resources", "assets", "cyberui")
 TEX = os.path.join(OUT, "textures", "gui")
 
-# version -> folder name; the mod picks one at random on the title screen
-PANORAMAS = {
-    "1.13": "ocean", "1.14": "village", "1.15": "bees", "1.16": "nether", "1.17": "caves",
-    "1.18": "peaks", "1.19": "swamp", "1.20": "cherry", "1.21": "trial_chambers", "1.21.4": "pale_garden",
-}
+# version -> folder name of the panorama bundled in the mod
+PANORAMAS = {"1.21.4": "pale_garden"}
 
 FONT = {
     "A": "010101111101101", "B": "110101110101110", "C": "011100100100011", "D": "110101101101110",
