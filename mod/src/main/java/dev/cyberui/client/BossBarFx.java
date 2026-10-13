@@ -41,13 +41,16 @@ public final class BossBarFx {
         GENERIC("boss_generic", 0xFCEE0A),
         DRAGON("boss_dragon", 0xC83CFF),
         WITHER("boss_wither", 0x965AFF),
-        RAID("boss_raid", 0xFF7828);
+        RAID("boss_raid", 0xFF283C);
 
         final ResourceLocation texture;
+        /** Ornaments drawn over the fill (head, skulls, axe, optic). */
+        final ResourceLocation front;
         final int neon;
 
         Style(String tex, int neon) {
             this.texture = ResourceLocation.fromNamespaceAndPath("cyberui", "textures/gui/" + tex + ".png");
+            this.front = ResourceLocation.fromNamespaceAndPath("cyberui", "textures/gui/" + tex + "_front.png");
             this.neon = neon;
         }
     }
@@ -282,6 +285,7 @@ public final class BossBarFx {
             }
         }
         notches(g, event.getOverlay(), bx, by);
+        g.blit(RenderType::guiTextured, style.front, fx, fy, 0.0F, 0.0F, FRAME_W, FRAME_H, FRAME_W, FRAME_H, 0xFFFFFFFF);
 
         particles(g, st, fx, fy, now, dt);
 
