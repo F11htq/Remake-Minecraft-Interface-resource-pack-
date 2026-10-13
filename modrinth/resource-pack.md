@@ -5,7 +5,7 @@ A black, yellow and red cyberpunk redesign of every Minecraft menu and inventory
 
 # CYBER//UI
 
-A cyberpunk redesign of **menus and interfaces only** for Minecraft 1.21.4. Blocks, mobs, the world and the in-game HUD (hotbar, hearts, XP bar, crosshair) stay exactly as they are.
+A cyberpunk redesign of **menus and interfaces only** for Minecraft 1.21.4. Blocks, mobs, the world and the in-game HUD (hotbar, hearts, XP bar, crosshair) stay exactly as they are; only boss health bars get the CYBER//UI look.
 
 Black panels, acid-yellow frames, neon-red accents and a bit of glitch.
 
@@ -22,6 +22,7 @@ Black panels, acid-yellow frames, neon-red accents and a bit of glitch.
 | Inventory and all containers | Dark panels, yellow and red top line, yellow titles; the vanilla layout is kept |
 | Creative inventory, recipe book, advancements | Same palette |
 | Menu backgrounds, separators | Near-black background with scanlines, yellow and red separators |
+| Boss bars | Dark chamfered casing with a neon striped fill that crawls (all 7 colours), tick-mark notches |
 | Title logo | Yellow and red with a chromatic "double image" |
 | Title panorama | The 1.21.4 panorama in a night-city colour grade with scanlines and a vignette |
 | Loading screen | Black instead of red when resources are reloaded |

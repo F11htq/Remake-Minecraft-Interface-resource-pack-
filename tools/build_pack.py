@@ -455,6 +455,75 @@ def build_menu_backgrounds():
 
 
 # --------------------------------------------------------------------------
+# Boss bars: dark chamfered casing, neon striped fill that crawls
+# --------------------------------------------------------------------------
+BOSS_COLORS = {
+    "pink": (255, 60, 180),
+    "blue": (0, 200, 255),
+    "red": (255, 0, 60),
+    "green": (60, 255, 120),
+    "yellow": (252, 238, 10),
+    "purple": (170, 80, 255),
+    "white": (230, 235, 255),
+}
+
+
+def boss_casing(col):
+    w, h = 182, 5
+    img = new(w, h)
+    rect(img, 0, 0, w - 1, h - 1, rgba(BG, 235))
+    edge = lerp(col, BLACK, 0.45)
+    for x in range(w):
+        img.putpixel((x, 0), rgba(edge))
+        img.putpixel((x, h - 1), rgba(edge))
+    for y in range(h):
+        img.putpixel((0, y), rgba(edge))
+        img.putpixel((w - 1, y), rgba(edge))
+    img.putpixel((0, 0), (0, 0, 0, 0))
+    img.putpixel((w - 1, h - 1), (0, 0, 0, 0))
+    rect(img, 1, 1, 2, 3, rgba(YELLOW))
+    return img
+
+
+def boss_fill(col, phase):
+    w, h = 182, 5
+    img = new(w, h)
+    rows = [lerp(col, WHITE, 0.55), col, col, lerp(col, BLACK, 0.25), lerp(col, BLACK, 0.5)]
+    for y in range(h):
+        for x in range(w):
+            c = rows[y]
+            if ((x + y + phase) // 3) % 2 == 0 and 0 < y < h - 1:
+                c = lerp(c, BLACK, 0.28)
+            img.putpixel((x, y), rgba(c))
+    img.putpixel((0, 0), (0, 0, 0, 0))
+    img.putpixel((0, h - 1), (0, 0, 0, 0))
+    return img
+
+
+def boss_notches(n, progress):
+    w, h = 182, 5
+    img = new(w, h)
+    for i in range(1, n):
+        x = round(i * (w - 1) / n)
+        for y in range(1, h - 1):
+            img.putpixel((x, y), rgba(BLACK, 230) if progress else rgba(lerp(BG, YELLOW, 0.35), 220))
+        if not progress:
+            img.putpixel((x, 0), rgba(YELLOW, 200))
+    return img
+
+
+def build_boss_bars():
+    for name, col in BOSS_COLORS.items():
+        save(boss_casing(col), "boss_bar/%s_background.png" % name)
+        frames = [boss_fill(col, -i) for i in range(6)]
+        strip, meta = animated(frames, frametime=2)
+        save(strip, "boss_bar/%s_progress.png" % name, meta)
+    for n in (6, 10, 12, 20):
+        save(boss_notches(n, False), "boss_bar/notched_%d_background.png" % n)
+        save(boss_notches(n, True), "boss_bar/notched_%d_progress.png" % n)
+
+
+# --------------------------------------------------------------------------
 # Container screens: palette re-map of the vanilla layout
 # --------------------------------------------------------------------------
 GREY_KEYS = [
@@ -670,6 +739,7 @@ def main():
     build_tooltip()
     build_slot_highlight()
     build_menu_backgrounds()
+    build_boss_bars()
     n = build_containers(args.vanilla)
     build_title(args.vanilla)
     build_icon()
