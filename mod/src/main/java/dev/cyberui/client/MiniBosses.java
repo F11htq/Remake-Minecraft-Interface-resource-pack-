@@ -14,7 +14,7 @@ import net.minecraft.world.entity.LivingEntity;
 
 /**
  * Health bars for strong mobs that have no vanilla boss bar (Warden, Iron Golem,
- * Wither Skeleton, Ravager, Evoker, Guardian). A bar appears once the mob takes
+ * Ravager, Evoker, Guardian). A bar appears once the mob takes
  * damage near the player; the most dangerous ones also show it on approach.
  */
 public final class MiniBosses {
@@ -45,8 +45,6 @@ public final class MiniBosses {
             return BossBarFx.Style.WARDEN;
         } else if (type == EntityType.IRON_GOLEM) {
             return BossBarFx.Style.GOLEM;
-        } else if (type == EntityType.WITHER_SKELETON) {
-            return BossBarFx.Style.WSKELETON;
         } else if (type == EntityType.RAVAGER) {
             return BossBarFx.Style.RAVAGER;
         } else if (type == EntityType.EVOKER) {
@@ -65,7 +63,7 @@ public final class MiniBosses {
 
     /** Common mobs do not get the GG victory screen. */
     private static boolean earnsGg(EntityType<?> type) {
-        return type != EntityType.WITHER_SKELETON && type != EntityType.GUARDIAN;
+        return type != EntityType.GUARDIAN;
     }
 
     public static List<Entry> collect(long now) {

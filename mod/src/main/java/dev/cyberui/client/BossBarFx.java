@@ -47,7 +47,6 @@ public final class BossBarFx {
         RAID("boss_raid", 0xFF283C, false),
         WARDEN("boss_warden", 0x1EE6F0, true),
         GOLEM("boss_golem", 0x8CE650, true),
-        WSKELETON("boss_wskeleton", 0xFF2D3C, true),
         RAVAGER("boss_ravager", 0xFF1E32, true),
         EVOKER("boss_evoker", 0xA555FF, true),
         GUARDIAN("boss_guardian", 0x28DCD2, true);
@@ -432,7 +431,6 @@ public final class BossBarFx {
                 drift(p, 0x6EC83C, 0xF0F0DC, 6, 1.6F);
                 p.y = BAR_Y - 12 + RANDOM.nextFloat() * 6;
             }
-            case WSKELETON -> drift(p, 0xFF2D3C, 0xFF8C28, -9, 1.0F);
             case RAVAGER -> drift(p, 0xFF1E32, 0x501014, -7, 1.0F);
             case EVOKER -> {
                 // floating magic orbs

@@ -45,7 +45,7 @@ Every boss gets its own ornate animated bar: a spear-shaped frame with the boss 
 - **Ender Dragon**: dragon wings and head, magenta fill.
 - **Wither**: three wither heads and floating skulls, blue fill.
 - **Raids**: illager axe and banner.
-- **Strong mobs without a vanilla boss bar** get one too: **Warden**, **Iron Golem**, **Wither Skeleton**, **Ravager**, **Evoker** and **Guardian**. Their bar appears once they take damage near you; the Warden, Ravager, Evoker and Elder Guardian also show it when they come within 16 blocks.
+- **Strong mobs without a vanilla boss bar** get one too: **Warden**, **Iron Golem**, **Ravager**, **Evoker** and **Guardian**. Their bar appears once they take damage near you; the Warden, Ravager, Evoker and Elder Guardian also show it when they come within 16 blocks.
 - **Other bosses** (including modded ones): cyberpunk tech frame.
 
 All bars have a damage trail, hit shake and flash, a low-health pulse, glitches and themed particles (sparks, bubbles, leaves, magic orbs...). When a boss dies (or a raid is won), a spinning 3D **GG** appears with a shockwave and the name of the defeated boss.
