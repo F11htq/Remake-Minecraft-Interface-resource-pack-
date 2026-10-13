@@ -36,6 +36,8 @@ public final class BossBarFx {
     private static final int BAR_W = 182;
     private static final int BAR_H = 5;
     private static final int ENTRY_H = 60;
+    /** On-screen size of the whole bar (frame, emblem, name) relative to the textures. */
+    private static final float SCALE = 0.8F;
 
     /** Visual style of a boss bar. */
     public enum Style {
@@ -124,10 +126,14 @@ public final class BossBarFx {
             update(st, event, now, dt);
             if (y < sh / 3) {
                 int fill = st.style == Style.GENERIC ? barColor(event.getColor()) : st.style.neon;
+                g.pose().pushPose();
+                g.pose().translate(sw / 2.0F, y, 0.0F);
+                g.pose().scale(SCALE, SCALE, 1.0F);
                 renderBar(g, font, event.getId(), event.getName(), fill, event.getOverlay(), st,
-                        sw / 2 - FRAME_W / 2, y, now, dt);
+                        -FRAME_W / 2, 0, now, dt);
+                g.pose().popPose();
             }
-            y += ENTRY_H;
+            y += Math.round(ENTRY_H * SCALE);
         }
         for (MiniBosses.Entry mob : MiniBosses.collect(now)) {
             alive.add(mob.id());
@@ -137,10 +143,14 @@ public final class BossBarFx {
             st.name = mob.entity().getDisplayName().getString();
             track(st, mob.progress(), now, dt);
             if (y < sh / 3) {
+                g.pose().pushPose();
+                g.pose().translate(sw / 2.0F, y, 0.0F);
+                g.pose().scale(SCALE, SCALE, 1.0F);
                 renderBar(g, font, mob.id(), mob.entity().getDisplayName(), st.style.neon,
-                        BossEvent.BossBarOverlay.PROGRESS, st, sw / 2 - FRAME_W / 2, y, now, dt);
+                        BossEvent.BossBarOverlay.PROGRESS, st, -FRAME_W / 2, 0, now, dt);
+                g.pose().popPose();
             }
-            y += ENTRY_H;
+            y += Math.round(ENTRY_H * SCALE);
         }
         // bars that vanished while almost dead also count as a win
         STATES.entrySet().removeIf(e -> {
