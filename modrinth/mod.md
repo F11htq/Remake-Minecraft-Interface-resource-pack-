@@ -40,14 +40,15 @@ On menu screens (title, options, world and server selection, pause menu) a dark 
 
 ## Boss bars
 
-Every boss gets its own animated frame with a cyberpunk touch:
+Every boss gets its own ornate animated bar: a spear-shaped frame with the boss emblem in the centre and the boss name on a neon plate.
 
-- **Ender Dragon**: bat wings, horned head with glowing eyes, end crystals, rising sparks.
-- **Wither**: skull cluster, bone spikes, wither rose vines, dark smoke and a shield sweep below 50%.
-- **Raids**: illager banners, crossed axes, torches and embers.
-- **Other bosses** (including modded ones): armoured tech frame with hazard stripes and a holographic reticle.
+- **Ender Dragon**: dragon wings and head, magenta fill.
+- **Wither**: three wither heads and floating skulls, blue fill.
+- **Raids**: illager axe and banner.
+- **Strong mobs without a vanilla boss bar** get one too: **Warden**, **Iron Golem**, **Wither Skeleton**, **Ravager**, **Evoker** and **Guardian**. Their bar appears once they take damage near you; the Warden, Ravager, Evoker and Elder Guardian also show it when they come within 16 blocks.
+- **Other bosses** (including modded ones): cyberpunk tech frame.
 
-All bars have a damage trail, hit shake and flash, a low-health pulse and occasional glitches. When a boss dies (or a raid is won), a spinning 3D **GG** appears with a shockwave and the name of the defeated boss.
+All bars have a damage trail, hit shake and flash, a low-health pulse, glitches and themed particles (sparks, bubbles, leaves, magic orbs...). When a boss dies (or a raid is won), a spinning 3D **GG** appears with a shockwave and the name of the defeated boss.
 
 ## Installation
 

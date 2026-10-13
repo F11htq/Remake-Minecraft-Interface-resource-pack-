@@ -48,6 +48,7 @@ jobs:
           check net.minecraft.client.gui.GuiGraphics "void flush|enableScissor|disableScissor"
           check net.minecraft.client.gui.components.BossHealthOverlay "events|void render"
           check net.minecraft.client.gui.components.LerpingBossEvent "getProgress"
+          check net.minecraft.client.multiplayer.ClientLevel "entitiesForRendering"
 
       - name: Upload jar
         uses: actions/upload-artifact@v4

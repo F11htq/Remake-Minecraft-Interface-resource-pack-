@@ -23,8 +23,9 @@ import net.minecraft.world.BossEvent;
 
 /**
  * Boss bars with a unique animated frame per boss (Ender Dragon, Wither, raid,
- * a generic cyberpunk frame for everything else), damage trail, hit shake,
- * low-health pulse and per-boss particles, plus a 3D "GG" victory animation.
+ * strong mobs from {@link MiniBosses}, a generic cyberpunk frame for everything
+ * else), damage trail, hit shake, low-health pulse and per-boss particles, plus
+ * a 3D "GG" victory animation.
  */
 public final class BossBarFx {
 
@@ -37,20 +38,30 @@ public final class BossBarFx {
     private static final int ENTRY_H = 60;
 
     /** Visual style of a boss bar. */
-    private enum Style {
-        GENERIC("boss_generic", 0xFCEE0A),
-        DRAGON("boss_dragon", 0xC83CFF),
-        WITHER("boss_wither", 0x965AFF),
-        RAID("boss_raid", 0xFF283C);
+    public enum Style {
+        GENERIC("boss_generic", 0xFCEE0A, false),
+        DRAGON("boss_dragon", 0xD24BFF, true),
+        WITHER("boss_wither", 0x3C78FF, true),
+        RAID("boss_raid", 0xFF283C, false),
+        WARDEN("boss_warden", 0x1EE6F0, true),
+        GOLEM("boss_golem", 0x8CE650, true),
+        WSKELETON("boss_wskeleton", 0xFF2D3C, true),
+        RAVAGER("boss_ravager", 0xFF1E32, true),
+        EVOKER("boss_evoker", 0xA555FF, true),
+        GUARDIAN("boss_guardian", 0x28DCD2, true);
 
         final ResourceLocation texture;
-        /** Ornaments drawn over the fill (head, skulls, axe, optic). */
+        /** Ornaments drawn over the fill (head, skulls, axe, emblem). */
         final ResourceLocation front;
+        /** Fill texture cut from the artwork, or null for a flat neon fill. */
+        final ResourceLocation fill;
         final int neon;
 
-        Style(String tex, int neon) {
+        Style(String tex, int neon, boolean fillTexture) {
             this.texture = ResourceLocation.fromNamespaceAndPath("cyberui", "textures/gui/" + tex + ".png");
             this.front = ResourceLocation.fromNamespaceAndPath("cyberui", "textures/gui/" + tex + "_front.png");
+            this.fill = fillTexture
+                    ? ResourceLocation.fromNamespaceAndPath("cyberui", "textures/gui/" + tex + "_fill.png") : null;
             this.neon = neon;
         }
     }
@@ -75,6 +86,7 @@ public final class BossBarFx {
         long lastHit = 0L;
         boolean seenAlive = false;
         boolean triggered = false;
+        boolean gg = true;
         String name = "";
         final List<Particle> particles = new ArrayList<>();
         float spawnAcc = 0.0F;
@@ -111,7 +123,22 @@ public final class BossBarFx {
             State st = STATES.computeIfAbsent(event.getId(), id -> new State());
             update(st, event, now, dt);
             if (y < sh / 3) {
-                renderBar(g, font, event, st, sw / 2 - FRAME_W / 2, y, now, dt);
+                int fill = st.style == Style.GENERIC ? barColor(event.getColor()) : st.style.neon;
+                renderBar(g, font, event.getId(), event.getName(), fill, event.getOverlay(), st,
+                        sw / 2 - FRAME_W / 2, y, now, dt);
+            }
+            y += ENTRY_H;
+        }
+        for (MiniBosses.Entry mob : MiniBosses.collect(now)) {
+            alive.add(mob.id());
+            State st = STATES.computeIfAbsent(mob.id(), id -> new State());
+            st.style = mob.style();
+            st.gg = mob.gg();
+            st.name = mob.entity().getDisplayName().getString();
+            track(st, mob.progress(), now, dt);
+            if (y < sh / 3) {
+                renderBar(g, font, mob.id(), mob.entity().getDisplayName(), st.style.neon,
+                        BossEvent.BossBarOverlay.PROGRESS, st, sw / 2 - FRAME_W / 2, y, now, dt);
             }
             y += ENTRY_H;
         }
@@ -121,7 +148,7 @@ public final class BossBarFx {
                 return false;
             }
             State st = e.getValue();
-            if (!st.triggered && st.seenAlive && st.style != Style.RAID && st.shown < 0.06F) {
+            if (!st.triggered && st.seenAlive && st.gg && st.style != Style.RAID && st.shown < 0.06F) {
                 startVictory("BOSS DEFEATED", st.name, st.style.neon);
             }
             return true;
@@ -160,8 +187,17 @@ public final class BossBarFx {
             st.style = Style.GENERIC;
         }
         st.name = event.getName().getString();
+        track(st, event.getProgress(), now, dt);
 
-        float p = Draw.clamp(event.getProgress(), 0.0F, 1.0F);
+        if (!st.triggered && st.seenAlive && st.style == Style.RAID && keys.contains("event.minecraft.raid.victory")) {
+            st.triggered = true;
+            startVictory("RAID VICTORY", "", Style.RAID.neon);
+        }
+    }
+
+    /** Damage trail, hit detection and the defeat trigger for any bar. */
+    private static void track(State st, float progress, long now, float dt) {
+        float p = Draw.clamp(progress, 0.0F, 1.0F);
         if (st.shown < 0.0F) {
             st.shown = p;
             st.trail = p;
@@ -180,14 +216,9 @@ public final class BossBarFx {
             st.seenAlive = true;
         }
 
-        if (!st.triggered && st.seenAlive) {
-            if (st.style == Style.RAID) {
-                if (keys.contains("event.minecraft.raid.victory")) {
-                    st.triggered = true;
-                    startVictory("RAID VICTORY", "", Style.RAID.neon);
-                }
-            } else if (p <= 0.002F) {
-                st.triggered = true;
+        if (!st.triggered && st.seenAlive && st.style != Style.RAID && p <= 0.002F) {
+            st.triggered = true;
+            if (st.gg) {
                 startVictory("BOSS DEFEATED", st.name, st.style.neon);
             }
         }
@@ -215,10 +246,9 @@ public final class BossBarFx {
         return (r << 16) | (gg << 8) | bb;
     }
 
-    private static void renderBar(GuiGraphics g, Font font, LerpingBossEvent event, State st,
-                                  int fx, int fy, long now, float dt) {
+    private static void renderBar(GuiGraphics g, Font font, UUID id, Component name, int fill,
+                                  BossEvent.BossBarOverlay overlay, State st, int fx, int fy, long now, float dt) {
         Style style = st.style;
-        int fill = style == Style.GENERIC ? barColor(event.getColor()) : style.neon;
 
         // hit shake
         long sinceHit = now - st.lastHit;
@@ -237,7 +267,7 @@ public final class BossBarFx {
         }
 
         // glitch: colour-split copies of the frame now and then
-        long gl = (now + event.getId().hashCode()) % 5200L;
+        long gl = (now + id.hashCode()) % 5200L;
         if (gl < 120L) {
             int d = gl < 60L ? 2 : -2;
             frame(g, style, fx - d, fy, Draw.argb(Draw.CYAN, 0.55F));
@@ -253,7 +283,19 @@ public final class BossBarFx {
         if (trailW > shownW) {
             g.fill(bx + shownW, by, bx + trailW, by + BAR_H, Draw.argb(mix(fill, 0xFFFFFF, 0.7F), 0.85F));
         }
-        if (shownW > 0) {
+        if (shownW > 0 && style.fill != null) {
+            // the artwork's own bar texture, revealed up to the current health
+            g.blit(RenderType::guiTextured, style.fill, bx, by, 0.0F, 0.0F, shownW, BAR_H, BAR_W, BAR_H);
+            // a soft shine sweeping along it
+            int sweep = (int) ((now / 9L) % (BAR_W + 60)) - 30;
+            for (int d = -8; d <= 8; d++) {
+                int x = sweep + d;
+                if (x >= 0 && x < shownW) {
+                    g.fill(bx + x, by, bx + x + 1, by + BAR_H, Draw.argb(0xFFFFFF, 0.22F * (1.0F - Math.abs(d) / 8.0F)));
+                }
+            }
+            g.fill(bx + shownW - 1, by, bx + shownW, by + BAR_H, Draw.argb(0xFFFFFF, 0.9F));
+        } else if (shownW > 0) {
             int[] rows = {mix(fill, 0xFFFFFF, 0.55F), fill, fill, mix(fill, 0x000000, 0.25F), mix(fill, 0x000000, 0.5F)};
             for (int r = 0; r < BAR_H; r++) {
                 g.fill(bx, by + r, bx + shownW, by + r + 1, Draw.argb(rows[r], 1.0F));
@@ -284,17 +326,25 @@ public final class BossBarFx {
                 }
             }
         }
-        notches(g, event.getOverlay(), bx, by);
+        notches(g, overlay, bx, by);
         g.blit(RenderType::guiTextured, style.front, fx, fy, 0.0F, 0.0F, FRAME_W, FRAME_H, FRAME_W, FRAME_H, 0xFFFFFFFF);
 
         particles(g, st, fx, fy, now, dt);
 
-        // name under the casing, in the boss colour
-        Component name = event.getName();
+        // name plate over the emblem, like the artwork's label
         int tw = font.width(name);
-        int tx = fx + FRAME_W / 2 - tw / 2;
-        int ty = fy + BAR_Y + BAR_H + 13;
-        g.drawString(font, name, tx, ty, Draw.argb(mix(fill, 0xFFFFFF, 0.35F), 1.0F), true);
+        int cx = fx + FRAME_W / 2;
+        int py = fy + 1;
+        int edge = Draw.argb(style.neon, 1.0F);
+        g.fill(cx - tw / 2 - 6, py, cx + tw / 2 + 6, py + 11, Draw.argb(0x07060C, 0.92F));
+        g.fill(cx - tw / 2 - 5, py - 1, cx + tw / 2 + 5, py, edge);
+        g.fill(cx - tw / 2 - 5, py + 11, cx + tw / 2 + 5, py + 12, edge);
+        g.fill(cx - tw / 2 - 7, py + 1, cx - tw / 2 - 6, py + 10, edge);
+        g.fill(cx + tw / 2 + 6, py + 1, cx + tw / 2 + 7, py + 10, edge);
+        // cyber tick marks running off the plate
+        g.fill(cx - tw / 2 - 16, py + 5, cx - tw / 2 - 8, py + 6, Draw.argb(style.neon, 0.6F));
+        g.fill(cx + tw / 2 + 8, py + 5, cx + tw / 2 + 16, py + 6, Draw.argb(style.neon, 0.6F));
+        g.drawString(font, name, cx - tw / 2, py + 2, Draw.argb(mix(style.neon, 0xFFFFFF, 0.55F), 1.0F), true);
     }
 
     private static void frame(GuiGraphics g, Style style, int x, int y, int color) {
@@ -322,9 +372,8 @@ public final class BossBarFx {
     private static void particles(GuiGraphics g, State st, int fx, int fy, long now, float dt) {
         float rate = switch (st.style) {
             case DRAGON -> 26.0F;
-            case WITHER -> 18.0F;
-            case RAID -> 14.0F;
             case GENERIC -> 6.0F;
+            default -> 16.0F;
         };
         st.spawnAcc += rate * dt;
         while (st.spawnAcc >= 1.0F && st.particles.size() < 48) {
@@ -361,15 +410,29 @@ public final class BossBarFx {
                 p.size = 1;
                 p.maxLife = 0.9F + RANDOM.nextFloat() * 0.8F;
             }
-            case WITHER -> {
-                // dark smoke drifting up from the casing
-                p.x = BAR_X + RANDOM.nextFloat() * BAR_W;
-                p.y = BAR_Y - 2;
-                p.vx = (RANDOM.nextFloat() * 2 - 1) * 4;
-                p.vy = -4 - RANDOM.nextFloat() * 6;
-                p.color = RANDOM.nextInt(4) == 0 ? 0x965AFF : 0x2A2232;
+            case WITHER -> drift(p, 0x3C78FF, 0x14183A, -5, 1.4F);
+            case WARDEN -> {
+                // sculk pulses: short vertical flickers along the bar
+                drift(p, 0x1EE6F0, 0x0A5A64, 0, 0.5F);
+                p.vy = 0;
+                p.size = 1;
+            }
+            case GOLEM -> {
+                // leaves and petals drifting down
+                drift(p, 0x6EC83C, 0xF0F0DC, 6, 1.6F);
+                p.y = BAR_Y - 12 + RANDOM.nextFloat() * 6;
+            }
+            case WSKELETON -> drift(p, 0xFF2D3C, 0xFF8C28, -9, 1.0F);
+            case RAVAGER -> drift(p, 0xFF1E32, 0x501014, -7, 1.0F);
+            case EVOKER -> {
+                // floating magic orbs
+                drift(p, 0xA555FF, 0xE6C8FF, -4, 1.8F);
+                p.size = 2;
+            }
+            case GUARDIAN -> {
+                // rising bubbles
+                drift(p, 0x8CF0FF, 0x28DCD2, -8, 1.5F);
                 p.size = RANDOM.nextInt(3) == 0 ? 2 : 1;
-                p.maxLife = 1.2F + RANDOM.nextFloat() * 0.8F;
             }
             case RAID -> {
                 // embers from the banners
@@ -393,6 +456,17 @@ public final class BossBarFx {
             }
         }
         return p;
+    }
+
+    /** Motes around the bar in two colours, drifting with the given vertical speed. */
+    private static void drift(Particle p, int a, int b, float vy, float life) {
+        p.x = BAR_X - 10 + RANDOM.nextFloat() * (BAR_W + 20);
+        p.y = BAR_Y - 10 + RANDOM.nextFloat() * (BAR_H + 20);
+        p.vx = (RANDOM.nextFloat() * 2 - 1) * 3;
+        p.vy = vy * (0.6F + RANDOM.nextFloat() * 0.8F);
+        p.color = RANDOM.nextInt(3) == 0 ? b : a;
+        p.size = 1;
+        p.maxLife = life * (0.7F + RANDOM.nextFloat() * 0.6F);
     }
 
     // ------------------------------------------------------------------
