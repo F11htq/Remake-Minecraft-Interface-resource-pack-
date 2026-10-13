@@ -38,6 +38,17 @@ On menu screens (title, options, world and server selection, pause menu) a dark 
 - Inventories and containers fade in softly with a scan line when opened.
 - Creative inventory: smooth scroll bar and a quick sweep when switching tabs.
 
+## Boss bars
+
+Every boss gets its own animated frame with a cyberpunk touch:
+
+- **Ender Dragon**: bat wings, horned head with glowing eyes, end crystals, rising sparks.
+- **Wither**: skull cluster, bone spikes, wither rose vines, dark smoke and a shield sweep below 50%.
+- **Raids**: illager banners, crossed axes, torches and embers.
+- **Other bosses** (including modded ones): armoured tech frame with hazard stripes and a holographic reticle.
+
+All bars have a damage trail, hit shake and flash, a low-health pulse and occasional glitches. When a boss dies (or a raid is won), a spinning 3D **GG** appears with a shockwave and the name of the defeated boss.
+
 ## Installation
 
 1. Install Fabric Loader for 1.21.4.

@@ -46,6 +46,8 @@ jobs:
           check net.minecraft.world.inventory.Slot "isHighlightable|isActive"
           check com.mojang.blaze3d.systems.RenderSystem "void setShaderColor"
           check net.minecraft.client.gui.GuiGraphics "void flush|enableScissor|disableScissor"
+          check net.minecraft.client.gui.components.BossHealthOverlay "events|void render"
+          check net.minecraft.client.gui.components.LerpingBossEvent "getProgress"
 
       - name: Upload jar
         uses: actions/upload-artifact@v4
