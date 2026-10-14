@@ -52,7 +52,7 @@ All bars have a damage trail, hit shake and flash, a low-health pulse, glitches 
 
 ## End exit portal beam
 
-When the exit portal opens, a purple energy beam as wide as the bedrock rim rises out of it into the sky: layered glow, pulses running up the column, cyberpunk scan rings, a shockwave across the ground and portal particles.
+When the exit portal opens, a glowing circle is traced around the bedrock rim and a purple energy beam as wide as the rim rises around it into the sky: layered glow, pulses running up the column, cyberpunk scan rings, a shockwave across the ground and portal particles.
 
 ## Installation
 
