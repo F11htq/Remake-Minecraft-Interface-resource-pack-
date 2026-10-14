@@ -88,6 +88,10 @@ public final class BossBarFx {
         boolean seenAlive = false;
         boolean triggered = false;
         boolean gg = true;
+        /** Set when the bar shatters (Ender Dragon): from then on only the burst is drawn. */
+        boolean shattered = false;
+        float lastX = 0.0F;
+        int lastY = 0;
         String name = "";
         final List<Particle> particles = new ArrayList<>();
         float spawnAcc = 0.0F;
@@ -102,6 +106,48 @@ public final class BossBarFx {
     private static String victoryTitle = "";
     private static String victoryName = "";
     private static int victoryColor = Draw.YELLOW;
+    // a victory waiting for a shatter burst to finish
+    private static long pendingVictoryAt = 0L;
+    private static String pendingName = "";
+    private static int pendingColor = Draw.YELLOW;
+
+    /** One flying piece of a shattered bar, in frame-local coordinates. */
+    private static final class Shard {
+        ResourceLocation tex;
+        int u;
+        int v;
+        int w;
+        int h;
+        int texW;
+        int texH;
+        float x;
+        float y;
+        float vx;
+        float vy;
+        float rot;
+        float vrot;
+    }
+
+    /** A bar exploding into shards with sparks, glitches and a shockwave. */
+    private static final class Burst {
+        final Style style;
+        final float x;
+        final int y;
+        final long at;
+        final List<Shard> shards = new ArrayList<>();
+        final List<Particle> sparks = new ArrayList<>();
+
+        Burst(Style style, float x, int y, long at) {
+            this.style = style;
+            this.x = x;
+            this.y = y;
+            this.at = at;
+        }
+    }
+
+    private static final List<Burst> BURSTS = new ArrayList<>();
+    private static final long BURST_MS = 1700L;
+    private static final long BURST_TO_GG_MS = 1250L;
 
     private BossBarFx() {
     }
@@ -123,7 +169,11 @@ public final class BossBarFx {
             alive.add(event.getId());
             State st = STATES.computeIfAbsent(event.getId(), id -> new State());
             update(st, event, now, dt);
-            if (y < sh / 3) {
+            st.lastX = sw / 2.0F;
+            st.lastY = y;
+            if (st.shattered) {
+                // the bar is gone; keep its slot so the other bars do not jump
+            } else if (y < sh / 3) {
                 int fill = st.style == Style.GENERIC ? barColor(event.getColor()) : st.style.neon;
                 g.pose().pushPose();
                 g.pose().translate(sw / 2.0F, y, 0.0F);
@@ -140,6 +190,8 @@ public final class BossBarFx {
             st.style = mob.style();
             st.gg = mob.gg();
             st.name = mob.entity().getDisplayName().getString();
+            st.lastX = sw / 2.0F;
+            st.lastY = y;
             track(st, mob.progress(), now, dt);
             if (y < sh / 3) {
                 g.pose().pushPose();
@@ -158,12 +210,30 @@ public final class BossBarFx {
             }
             State st = e.getValue();
             if (!st.triggered && st.seenAlive && st.gg && st.style != Style.RAID && st.shown < 0.06F) {
-                startVictory("BOSS DEFEATED", st.name, st.style.neon);
+                defeat(st, now);
             }
             return true;
         });
 
+        if (pendingVictoryAt != 0L && now >= pendingVictoryAt) {
+            pendingVictoryAt = 0L;
+            startVictory("BOSS DEFEATED", pendingName, pendingColor);
+        }
+        renderBursts(g, font, sw, now, dt);
         renderVictory(g, font, sw, sh, now);
+    }
+
+    /** A boss died: the Ender Dragon's bar explodes first, then the GG plays. */
+    private static void defeat(State st, long now) {
+        if (st.style == Style.DRAGON) {
+            st.shattered = true;
+            BURSTS.add(burst(st.style, st.lastX, st.lastY, now));
+            pendingVictoryAt = now + BURST_TO_GG_MS;
+            pendingName = st.name;
+            pendingColor = st.style.neon;
+        } else {
+            startVictory("BOSS DEFEATED", st.name, st.style.neon);
+        }
     }
 
     // ------------------------------------------------------------------
@@ -228,7 +298,7 @@ public final class BossBarFx {
         if (!st.triggered && st.seenAlive && st.style != Style.RAID && p <= 0.002F) {
             st.triggered = true;
             if (st.gg) {
-                startVictory("BOSS DEFEATED", st.name, st.style.neon);
+                defeat(st, now);
             }
         }
     }
@@ -475,6 +545,188 @@ public final class BossBarFx {
         p.color = RANDOM.nextInt(3) == 0 ? b : a;
         p.size = 1;
         p.maxLife = life * (0.7F + RANDOM.nextFloat() * 0.6F);
+    }
+
+    // ------------------------------------------------------------------
+    // shatter burst
+    // ------------------------------------------------------------------
+    private static Burst burst(Style style, float x, int y, long now) {
+        Burst b = new Burst(style, x, y, now);
+        float cx = FRAME_W / 2.0F;
+        float cy = BAR_Y + BAR_H / 2.0F;
+        int tile = 16;
+        // frame and emblem cut into 16x16 tiles
+        for (ResourceLocation tex : new ResourceLocation[] {style.texture, style.front}) {
+            for (int ty = 0; ty < FRAME_H; ty += tile) {
+                for (int tx = 0; tx < FRAME_W; tx += tile) {
+                    b.shards.add(shard(tex, tx, ty, tile, tile, FRAME_W, FRAME_H, tx, ty, cx, cy, 1.0F));
+                }
+            }
+        }
+        // the health fill splinters into thin glowing slivers
+        if (style.fill != null) {
+            for (int fx = 0; fx < BAR_W; fx += 7) {
+                b.shards.add(shard(style.fill, fx, 0, 7, BAR_H, BAR_W, BAR_H, BAR_X + fx, BAR_Y, cx, cy, 1.6F));
+            }
+        }
+        // sparks bursting out of the bar line
+        for (int i = 0; i < 120; i++) {
+            Particle p = new Particle();
+            p.x = BAR_X + RANDOM.nextFloat() * BAR_W;
+            p.y = cy;
+            double a = RANDOM.nextDouble() * Math.PI * 2.0;
+            float speed = 40.0F + RANDOM.nextFloat() * 220.0F;
+            p.vx = (float) Math.cos(a) * speed;
+            p.vy = (float) Math.sin(a) * speed * 0.6F;
+            int pick = RANDOM.nextInt(6);
+            p.color = pick == 0 ? Draw.YELLOW : pick == 1 ? Draw.CYAN : pick == 2 ? 0xFFFFFF : style.neon;
+            p.size = RANDOM.nextInt(4) == 0 ? 2 : 1;
+            p.maxLife = 0.5F + RANDOM.nextFloat() * 0.9F;
+            b.sparks.add(p);
+        }
+        return b;
+    }
+
+    private static Shard shard(ResourceLocation tex, int u, int v, int w, int h, int texW, int texH,
+                               int x, int y, float cx, float cy, float boost) {
+        Shard s = new Shard();
+        s.tex = tex;
+        s.u = u;
+        s.v = v;
+        s.w = w;
+        s.h = h;
+        s.texW = texW;
+        s.texH = texH;
+        s.x = x + w / 2.0F;
+        s.y = y + h / 2.0F;
+        float dx = s.x - cx;
+        float dy = s.y - cy;
+        float len = (float) Math.max(1.0, Math.sqrt(dx * dx + dy * dy));
+        float speed = (50.0F + RANDOM.nextFloat() * 120.0F) * boost;
+        s.vx = dx / len * speed + (RANDOM.nextFloat() * 2 - 1) * 30.0F;
+        s.vy = dy / len * speed * 0.8F - 40.0F - RANDOM.nextFloat() * 60.0F;
+        s.vrot = (RANDOM.nextFloat() * 2 - 1) * 420.0F;
+        return s;
+    }
+
+    private static void renderBursts(GuiGraphics g, Font font, int sw, long now, float dt) {
+        for (int i = BURSTS.size() - 1; i >= 0; i--) {
+            Burst b = BURSTS.get(i);
+            long t = now - b.at;
+            if (t > BURST_MS) {
+                BURSTS.remove(i);
+                continue;
+            }
+            float k = t / (float) BURST_MS;
+            float fade = t > 900L ? 1.0F - (t - 900L) / (float) (BURST_MS - 900L) : 1.0F;
+            int neon = b.style.neon;
+
+            g.pose().pushPose();
+            g.pose().translate(0.0F, 0.0F, 250.0F);
+
+            // the bar line flares out across the whole screen
+            if (t < 420L) {
+                float f = 1.0F - t / 420.0F;
+                int half = Math.round((FRAME_W * SCALE / 2.0F) + (sw / 2.0F) * Draw.easeOut(t / 420.0F));
+                int ly = b.y + Math.round((BAR_Y + BAR_H / 2.0F) * SCALE);
+                g.fill(Math.round(b.x) - half, ly - 1, Math.round(b.x) + half, ly + 1, Draw.argb(0xFFFFFF, 0.85F * f));
+                g.fill(Math.round(b.x) - half, ly - 3, Math.round(b.x) + half, ly + 3, Draw.argb(neon, 0.35F * f));
+            }
+
+            g.pose().pushPose();
+            g.pose().translate(b.x, b.y, 0.0F);
+            g.pose().scale(SCALE, SCALE, 1.0F);
+            g.pose().translate(-FRAME_W / 2.0F, 0.0F, 0.0F);
+
+            if (t < 140L) {
+                // overload: the intact bar flickers white, sliced by glitches
+                for (int s = 0; s < FRAME_H; s += 4) {
+                    int off = RANDOM.nextInt(5) == 0 ? (RANDOM.nextInt(13) - 6) : 0;
+                    g.blit(RenderType::guiTextured, b.style.texture, off, s, 0.0F, s, FRAME_W, 4, FRAME_W, FRAME_H, 0xFFFFFFFF);
+                    g.blit(RenderType::guiTextured, b.style.front, off, s, 0.0F, s, FRAME_W, 4, FRAME_W, FRAME_H, 0xFFFFFFFF);
+                }
+                g.fill(0, 0, FRAME_W, FRAME_H, Draw.argb(0xFFFFFF, 0.55F * (1.0F - t / 140.0F)));
+            } else {
+                float st = (t - 140L) / 1000.0F;
+                for (Shard s : b.shards) {
+                    float x = s.x + s.vx * st;
+                    float y = s.y + s.vy * st + 0.5F * 260.0F * st * st;
+                    float rot = s.vrot * st;
+                    float scale = Math.max(0.0F, 1.0F - st * 0.45F);
+                    if (t < 600L) {
+                        // chromatic split on the freshly broken pieces
+                        float ca = 0.45F * (1.0F - (t - 140L) / 460.0F) * fade;
+                        drawShard(g, s, x - 1.5F, y, rot, scale, Draw.argb(Draw.CYAN, ca));
+                        drawShard(g, s, x + 1.5F, y, rot, scale, Draw.argb(Draw.RED, ca));
+                    }
+                    drawShard(g, s, x, y, rot, scale, Draw.argb(0xFFFFFF, fade));
+                }
+            }
+
+            // sparks
+            for (Particle p : b.sparks) {
+                float lt = t / 1000.0F;
+                if (lt > p.maxLife) {
+                    continue;
+                }
+                float drag = (float) (1.0 - Math.exp(-lt * 2.2)) / 2.2F;
+                int x = Math.round(p.x + p.vx * drag);
+                int y = Math.round(p.y + p.vy * drag + 40.0F * lt * lt);
+                g.fill(x, y, x + p.size, y + p.size, Draw.argb(p.color, (1.0F - lt / p.maxLife) * fade));
+            }
+
+            // shockwave: chamfered rings rushing outwards
+            for (int r = 0; r < 2; r++) {
+                long rt = t - r * 120L;
+                if (rt > 0L && rt < 700L) {
+                    float e = Draw.easeOut(rt / 700.0F);
+                    int rw = Math.round(60 + e * 360);
+                    int rh = Math.round(8 + e * 70);
+                    int cx = FRAME_W / 2;
+                    int cy = BAR_Y + BAR_H / 2;
+                    float a = (1.0F - rt / 700.0F) * fade;
+                    Draw.frame(g, cx - rw / 2, cy - rh / 2, rw, rh, Draw.argb(r == 0 ? neon : Draw.YELLOW, a));
+                }
+            }
+
+            // glitch slices across the blast
+            if (t > 140L && t < 1100L && (t / 70L) % 3L == 0L) {
+                int gy = RANDOM.nextInt(FRAME_H);
+                g.fill(-20, gy, FRAME_W + 20, gy + 1, Draw.argb(Draw.CYAN, 0.5F * fade));
+                g.fill(-14, gy + 2, FRAME_W + 26, gy + 3, Draw.argb(Draw.RED, 0.5F * fade));
+            }
+
+            // terminal readout
+            if (t > 220L) {
+                String msg = "// TARGET TERMINATED";
+                int chars = (int) Math.min(msg.length(), (t - 220L) / 28L);
+                String shown = msg.substring(0, chars) + ((t / 120L) % 2L == 0L && chars < msg.length() ? "_" : "");
+                int tw = font.width(msg);
+                int tx = FRAME_W / 2 - tw / 2;
+                int ty = BAR_Y - 4;
+                boolean flicker = (t / 50L) % 9L == 0L;
+                g.fill(tx - 4, ty - 2, tx + tw + 4, ty + 10, Draw.argb(0x07060C, 0.8F * fade));
+                g.drawString(font, shown, tx + (flicker ? 1 : 0), ty, Draw.argb(flicker ? Draw.CYAN : Draw.RED, fade), true);
+            }
+
+            g.pose().popPose();
+            g.pose().popPose();
+            if (k >= 1.0F) {
+                BURSTS.remove(i);
+            }
+        }
+    }
+
+    private static void drawShard(GuiGraphics g, Shard s, float x, float y, float rot, float scale, int color) {
+        if (scale <= 0.01F) {
+            return;
+        }
+        g.pose().pushPose();
+        g.pose().translate(x, y, 0.0F);
+        g.pose().mulPose(Axis.ZP.rotationDegrees(rot));
+        g.pose().scale(scale, scale, 1.0F);
+        g.blit(RenderType::guiTextured, s.tex, -s.w / 2, -s.h / 2, (float) s.u, (float) s.v, s.w, s.h, s.texW, s.texH, color);
+        g.pose().popPose();
     }
 
     // ------------------------------------------------------------------
