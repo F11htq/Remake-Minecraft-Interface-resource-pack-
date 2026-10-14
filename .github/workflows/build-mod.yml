@@ -49,6 +49,14 @@ jobs:
           check net.minecraft.client.gui.components.BossHealthOverlay "events|void render"
           check net.minecraft.client.gui.components.LerpingBossEvent "getProgress"
           check net.minecraft.client.multiplayer.ClientLevel "entitiesForRendering"
+          check net.minecraft.client.renderer.blockentity.BeaconRenderer "renderBeaconBeam|shouldRenderOffScreen|getViewDistance"
+          check net.minecraft.client.renderer.blockentity.TheEndPortalRenderer "render|shouldRender|getViewDistance"
+          check net.minecraft.client.renderer.blockentity.BlockEntityRenderer "render|shouldRender|getViewDistance"
+          check com.mojang.blaze3d.vertex.VertexConsumer "addVertex\\(|setColor\\("
+          check net.minecraft.client.renderer.RenderType "lightning|beaconBeam|debugQuads"
+          check net.minecraft.client.multiplayer.ClientLevel "void addParticle|void addAlwaysVisibleParticle"
+          check net.minecraft.world.level.Level "dimension\\(|END;"
+          check net.minecraft.client.renderer.LevelRenderer " renderLevel\\("
 
       - name: Upload jar
         uses: actions/upload-artifact@v4
