@@ -57,6 +57,8 @@ jobs:
           check net.minecraft.client.multiplayer.ClientLevel "void addParticle|void addAlwaysVisibleParticle"
           check net.minecraft.world.level.Level "dimension\\(|END;"
           check net.minecraft.client.renderer.LevelRenderer " renderLevel\\("
+          check net.minecraft.client.Camera "void setup|setRotation|getXRot|getYRot"
+          check net.minecraft.sounds.SoundEvents "LIGHTNING_BOLT_THUNDER|LIGHTNING_BOLT_IMPACT"
 
       - name: Upload jar
         uses: actions/upload-artifact@v4
