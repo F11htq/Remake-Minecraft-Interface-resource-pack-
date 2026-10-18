@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
@@ -24,7 +23,7 @@ import org.joml.Matrix4f;
  * pierces the island; on impact the beam bursts open to full width, a shock
  * front rolls across the island and the ground shakes. The beam then stays,
  * reaching up into the sky and down into the void below the island: a
- * textured white-hot core inside streaming energy layers (the vanilla beam
+ * translucent white-hot core inside streaming energy layers (the vanilla beam
  * texture, scrolling upwards) and a soft additive halo.
  */
 public final class PortalBeam {
@@ -93,24 +92,17 @@ public final class PortalBeam {
         float flash = sinceImpact <= 0.0F ? 0.0F : (1.0F - open) * (1.0F - open);
 
         ps.pushPose();
-        // the anchor block is at x 1: move onto the pillar's block, the core centres itself on it
-        ps.translate(-1.0F, 0.75F, 0.0F);
-
-        // white-hot textured core
-        if (width > 0.0F) {
-            int bottom = (int) Math.floor(tip);
-            BeaconRenderer.renderBeaconBeam(ps, buffers, BEAM, partialTick, 1.0F, tick, bottom, (int) TOP - bottom,
-                    0xFFF0DCFF, 0.85F * width, 1.3F * width);
-        }
-
-        // move to the pillar centre for everything else
-        ps.translate(0.5F, 0.0F, 0.5F);
+        // the anchor block is at x 1; the beam is centred on the pillar at x 0.5, z 0.5
+        ps.translate(-0.5F, 0.75F, 0.5F);
         Matrix4f m = ps.last().pose();
         float spin = time * 0.3F;
 
         // streaming energy layers; inner ones turn the other way
         if (width > 0.0F) {
             VertexConsumer streaks = buffers.getBuffer(RenderType.beaconBeam(BEAM, true));
+            // white-hot core: translucent like everything else, so the pillar and dragon egg show through
+            streakLayer(streaks, m, 0.6F * width, 0xFFFFFF, 0.45F, time, tip, depth, spin * 2.0F, 2.2F);
+            streakLayer(streaks, m, 1.1F * width, 0xF0DCFF, 0.40F, time, tip, depth, -spin * 1.8F, 1.9F);
             streakLayer(streaks, m, 1.9F * width, 0xFF70F0, 0.60F, time, tip, depth, -spin * 1.6F, 1.6F);
             streakLayer(streaks, m, 2.8F * width, 0xC24CFF, 0.42F, time, tip, depth, spin * 1.2F, 1.1F);
             streakLayer(streaks, m, RADIUS * width, 0x8A34F0, 0.30F, time, tip, depth, -spin, 0.8F);
@@ -125,6 +117,7 @@ public final class PortalBeam {
         } else {
             // soft halo around the column, flaring on impact
             float glowBoost = 1.0F + 2.5F * flash;
+            haloLayer(glow, m, 0.5F * width, 0xFFFFFF, 0.22F * glowBoost, time, tip, depth);
             haloLayer(glow, m, (RADIUS + 0.9F) * width, 0x9A3CFF, 0.10F * glowBoost, time, tip, depth);
             haloLayer(glow, m, (RADIUS + 2.4F) * width, 0x6A22D0, 0.05F * glowBoost, time, tip, depth);
             // the beam glows brightest where it leaves the portal
