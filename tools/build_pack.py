@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Builds the "CYBER//UI" resource pack textures for Minecraft 1.21.4.
+"""Builds the "CYBER//UI" resource pack textures for Minecraft 26.3.
 
 Cyberpunk restyle of menus and screens only: buttons, sliders, text fields,
 checkboxes, tabs, scroll bars, tooltips, slot highlights, menu backgrounds,
 every container / inventory screen, the title logo and panorama overlay.
-The in-game HUD and the world stay vanilla.
+The world and most of the HUD stay vanilla; the hotbar and boss bars are restyled.
 
 Usage:
-    python3 tools/build_pack.py --vanilla <path to an extracted 1.21.4 client
+    python3 tools/build_pack.py --vanilla <path to an extracted 26.3 client
     'assets/minecraft/textures/gui' folder>
 
 The vanilla folder is used only as a layout reference: container screens and
@@ -524,6 +524,87 @@ def build_boss_bars():
 
 
 # --------------------------------------------------------------------------
+# Hotbar: dark armoured strip with slot wells, neon edge and a light pulse
+# running along it; the selection is a chamfered yellow target frame.
+# The CYBER//UI mod animates these further (gliding selection, boot-up, ...).
+# --------------------------------------------------------------------------
+def hotbar_base(w, h, slots, x_off=0):
+    img = new(w, h)
+    vgrad(img, 0, 0, w - 1, h - 1, (20, 20, 27), (9, 9, 13), 238)
+    frame_rect(img, 0, 0, w - 1, h - 1, rgba(BLACK))
+    frame_rect(img, 1, 1, w - 2, h - 2, rgba(EDGE, 200))
+    for i in range(slots):
+        x0 = x_off + 2 + i * 20
+        # slot well: 18x18 with a dark inset and a lighter lower edge
+        rect(img, x0, 2, x0 + 17, 19, rgba(SLOT_SH))
+        rect(img, x0 + 1, 3, x0 + 16, 18, rgba(SLOT, 235))
+        for x in range(x0 + 1, x0 + 17):
+            img.putpixel((x, 19), rgba(DIM))
+        # tiny yellow index tick in the top-left of each well
+        img.putpixel((x0 + 1, 3), rgba(lerp(YELLOW, BLACK, 0.45)))
+        img.putpixel((x0 + 2, 3), rgba(lerp(YELLOW, BLACK, 0.65)))
+    # neon top edge: yellow fading into red towards the right
+    for x in range(1, w - 1):
+        img.putpixel((x, 0), rgba(lerp(YELLOW, RED, x / max(1, w - 2))))
+    chamfer(img, 3, ("br", "tl"))
+    chamfer_edge(img, 3, rgba(YELLOW), ("tl",))
+    chamfer_edge(img, 3, rgba(EDGE), ("br",))
+    return img
+
+
+def build_hotbar():
+    w, h = 182, 22
+    base = hotbar_base(w, h, 9)
+    frames = []
+    n = 24
+    for f in range(n):
+        img = base.copy()
+        # a short bright pulse travels along the neon edge
+        head = int((f / n) * (w + 40)) - 20
+        for d in range(16):
+            x = head - d
+            if 3 <= x < w - 1:
+                k = 1.0 - d / 16
+                c = img.getpixel((x, 0))
+                img.putpixel((x, 0), rgba(lerp(c[:3], WHITE, 0.8 * k)))
+                if d < 8:
+                    c = img.getpixel((x, 1))
+                    img.putpixel((x, 1), rgba(lerp(c[:3], YELLOW, 0.5 * (1 - d / 8)), 255))
+        frames.append(img)
+    strip, meta = animated(frames, frametime=2)
+    save(strip, "hud/hotbar.png", meta)
+
+    # offhand slot: same armour, single well; vanilla anchors the well at x 3
+    for side in ("left", "right"):
+        img = new(29, 24)
+        body = hotbar_base(22, 22, 1, x_off=0)
+        dx = 0 if side == "left" else 7
+        img.alpha_composite(body, (dx, 1))
+        save(img, "hud/hotbar_offhand_%s.png" % side)
+
+    # selection: chamfered yellow target frame with a red corner marker and a
+    # soft glow that breathes
+    frames = []
+    for f in range(12):
+        glow = 0.35 + 0.35 * pulse(f / 12)
+        img = new(24, 23)
+        for t in range(3):
+            frame_rect(img, t, t, 23 - t, 22 - t, rgba(lerp(BLACK, YELLOW, 1.0 if t == 1 else 0.55), 255 if t else 200))
+        # inner glow line
+        frame_rect(img, 3, 3, 20, 19, rgba(YELLOW, int(110 * glow)))
+        # red marker top-left, hazard ticks bottom-right
+        rect(img, 1, 1, 6, 2, rgba(RED))
+        rect(img, 1, 1, 2, 6, rgba(RED))
+        for x in range(14, 22, 3):
+            img.putpixel((x, 21), rgba(BLACK))
+        chamfer(img, 3, ("br",))
+        chamfer_edge(img, 3, rgba(YELLOW), ("br",))
+        frames.append(img)
+    strip, meta = animated(frames, frametime=2, interpolate=True)
+    save(strip, "hud/hotbar_selection.png", meta)
+
+
+# --------------------------------------------------------------------------
 # Container screens: palette re-map of the vanilla layout
 # --------------------------------------------------------------------------
 GREY_KEYS = [
@@ -725,7 +806,7 @@ def build_icon():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--vanilla", required=True, help="vanilla 1.21.4 assets/minecraft/textures/gui")
+    ap.add_argument("--vanilla", required=True, help="vanilla 26.3 assets/minecraft/textures/gui")
     args = ap.parse_args()
 
     if os.path.isdir(GUI):
@@ -740,6 +821,7 @@ def main():
     build_slot_highlight()
     build_menu_backgrounds()
     build_boss_bars()
+    build_hotbar()
     n = build_containers(args.vanilla)
     build_title(args.vanilla)
     build_icon()

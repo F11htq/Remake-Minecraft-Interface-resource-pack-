@@ -1,6 +1,6 @@
 <!-- Modrinth project: CYBER//UI (Mod, Fabric, client side only)
 Summary (short description field):
-Cyberpunk title screen, custom loading screen and smooth inventories for Fabric 1.21.4. Animated button column, glitching logo, screen transitions and gliding slot highlights.
+Cyberpunk title screen, custom loading screen, animated hotbar and smooth inventories for Fabric 26.3. Animated button column, glitching logo, screen transitions and gliding slot highlights.
 -->
 
 # CYBER//UI — mod
@@ -17,7 +17,8 @@ The companion mod for the **CYBER//UI** resource pack. It adds what a resource p
   - glitch bursts every few seconds;
   - a scan line sweep and a gentle float.
 - A **SYS//STAT** HUD panel slides in on the right, and a hazard strip runs along the bottom.
-- The 1.21.4 panorama in the CYBER//UI night-city colour grade, even without the resource pack.
+- The Pale Garden panorama in the CYBER//UI night-city colour grade, even without the resource pack.
+- An **animated hotbar**: it boots up when you join a world or respawn (rises into place, slots come online one by one behind a scan line), the selection frame glides between slots with afterimages and a red/cyan split, the selected item lifts and its slot number flashes, picked-up items flash their slot, nearly broken tools pulse red, and the item name is typed out on a name plate in its rarity colour.
 
 ## Loading screen
 
@@ -56,7 +57,7 @@ When the exit portal opens, a white-hot needle drops out of the sky and pierces 
 
 ## Installation
 
-1. Install Fabric Loader for 1.21.4.
+1. Install Fabric Loader (0.20 or newer) for Minecraft 26.3. The game needs Java 25.
 2. Put the jar into your `mods` folder.
 3. Recommended: also enable the **CYBER//UI** resource pack.
 

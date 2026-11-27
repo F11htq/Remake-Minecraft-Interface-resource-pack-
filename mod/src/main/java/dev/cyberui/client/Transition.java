@@ -1,7 +1,7 @@
 package dev.cyberui.client;
 
-import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.Util;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -47,7 +47,7 @@ public final class Transition {
                 || s instanceof JoinMultiplayerScreen || s instanceof PackSelectionScreen;
     }
 
-    public static void render(Screen screen, GuiGraphics g) {
+    public static void render(Screen screen, GuiGraphicsExtractor g) {
         if (screen != current) {
             return;
         }
@@ -60,8 +60,8 @@ public final class Transition {
         float t = Math.max(0L, elapsed - HOLD_MS) / (float) SLIDE_MS;
         int bottom = Math.round((h + 8) * (1.0F - Draw.easeOut(t)));
 
-        g.pose().pushPose();
-        g.pose().translate(0.0F, 0.0F, 500.0F);
+        // a new stratum is drawn above everything extracted so far, tooltips included
+        g.nextStratum();
         // shutter body with scanlines
         g.fill(0, 0, w, bottom, Draw.argb(Draw.BG, 1.0F));
         for (int y = 0; y < bottom; y += 2) {
@@ -81,6 +81,5 @@ public final class Transition {
             int len = 2 + (int) ((v >>> 8) % 6);
             g.fill(x, bottom + 2, x + len, bottom + 3, Draw.argb(i % 2 == 0 ? Draw.CYAN : 0xFFFFFF, 1.0F));
         }
-        g.pose().popPose();
     }
 }

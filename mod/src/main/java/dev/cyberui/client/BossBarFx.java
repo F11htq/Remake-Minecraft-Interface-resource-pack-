@@ -9,16 +9,15 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
-import com.mojang.math.Axis;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.LerpingBossEvent;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.BossEvent;
 
 /**
@@ -51,18 +50,18 @@ public final class BossBarFx {
         EVOKER("boss_evoker", 0xA555FF, true),
         GUARDIAN("boss_guardian", 0x28DCD2, true);
 
-        final ResourceLocation texture;
+        final Identifier texture;
         /** Ornaments drawn over the fill (head, skulls, axe, emblem). */
-        final ResourceLocation front;
+        final Identifier front;
         /** Fill texture cut from the artwork, or null for a flat neon fill. */
-        final ResourceLocation fill;
+        final Identifier fill;
         final int neon;
 
         Style(String tex, int neon, boolean fillTexture) {
-            this.texture = ResourceLocation.fromNamespaceAndPath("cyberui", "textures/gui/" + tex + ".png");
-            this.front = ResourceLocation.fromNamespaceAndPath("cyberui", "textures/gui/" + tex + "_front.png");
+            this.texture = Identifier.fromNamespaceAndPath("cyberui", "textures/gui/" + tex + ".png");
+            this.front = Identifier.fromNamespaceAndPath("cyberui", "textures/gui/" + tex + "_front.png");
             this.fill = fillTexture
-                    ? ResourceLocation.fromNamespaceAndPath("cyberui", "textures/gui/" + tex + "_fill.png") : null;
+                    ? Identifier.fromNamespaceAndPath("cyberui", "textures/gui/" + tex + "_fill.png") : null;
             this.neon = neon;
         }
     }
@@ -113,7 +112,7 @@ public final class BossBarFx {
 
     /** One flying piece of a shattered bar, in frame-local coordinates. */
     private static final class Shard {
-        ResourceLocation tex;
+        Identifier tex;
         int u;
         int v;
         int w;
@@ -155,7 +154,7 @@ public final class BossBarFx {
     // ------------------------------------------------------------------
     // entry point
     // ------------------------------------------------------------------
-    public static void render(GuiGraphics g, Map<UUID, LerpingBossEvent> events) {
+    public static void render(GuiGraphicsExtractor g, Map<UUID, LerpingBossEvent> events) {
         long now = Util.getMillis();
         float dt = lastFrame == 0L ? 0.016F : Math.min(0.1F, (now - lastFrame) / 1000.0F);
         lastFrame = now;
@@ -175,12 +174,12 @@ public final class BossBarFx {
                 // the bar is gone; keep its slot so the other bars do not jump
             } else if (y < sh / 3) {
                 int fill = st.style == Style.GENERIC ? barColor(event.getColor()) : st.style.neon;
-                g.pose().pushPose();
-                g.pose().translate(sw / 2.0F, y, 0.0F);
-                g.pose().scale(SCALE, SCALE, 1.0F);
+                g.pose().pushMatrix();
+                g.pose().translate(sw / 2.0F, y);
+                g.pose().scale(SCALE, SCALE);
                 renderBar(g, font, event.getId(), event.getName(), fill, event.getOverlay(), st,
                         -FRAME_W / 2, 0, now, dt);
-                g.pose().popPose();
+                g.pose().popMatrix();
             }
             y += Math.round(ENTRY_H * SCALE);
         }
@@ -194,12 +193,12 @@ public final class BossBarFx {
             st.lastY = y;
             track(st, mob.progress(), now, dt);
             if (y < sh / 3) {
-                g.pose().pushPose();
-                g.pose().translate(sw / 2.0F, y, 0.0F);
-                g.pose().scale(SCALE, SCALE, 1.0F);
+                g.pose().pushMatrix();
+                g.pose().translate(sw / 2.0F, y);
+                g.pose().scale(SCALE, SCALE);
                 renderBar(g, font, mob.id(), mob.entity().getDisplayName(), st.style.neon,
                         BossEvent.BossBarOverlay.PROGRESS, st, -FRAME_W / 2, 0, now, dt);
-                g.pose().popPose();
+                g.pose().popMatrix();
             }
             y += Math.round(ENTRY_H * SCALE);
         }
@@ -226,6 +225,7 @@ public final class BossBarFx {
     /** A boss died: the Ender Dragon's bar explodes first, then the GG plays. */
     private static void defeat(State st, long now) {
         if (st.style == Style.DRAGON) {
+            PortalBeam.onDragonKilled();
             st.shattered = true;
             BURSTS.add(burst(st.style, st.lastX, st.lastY, now));
             pendingVictoryAt = now + BURST_TO_GG_MS;
@@ -325,7 +325,7 @@ public final class BossBarFx {
         return (r << 16) | (gg << 8) | bb;
     }
 
-    private static void renderBar(GuiGraphics g, Font font, UUID id, Component name, int fill,
+    private static void renderBar(GuiGraphicsExtractor g, Font font, UUID id, Component name, int fill,
                                   BossEvent.BossBarOverlay overlay, State st, int fx, int fy, long now, float dt) {
         Style style = st.style;
 
@@ -364,7 +364,7 @@ public final class BossBarFx {
         }
         if (shownW > 0 && style.fill != null) {
             // the artwork's own bar texture, revealed up to the current health
-            g.blit(RenderType::guiTextured, style.fill, bx, by, 0.0F, 0.0F, shownW, BAR_H, BAR_W, BAR_H);
+            g.blit(RenderPipelines.GUI_TEXTURED, style.fill, bx, by, 0.0F, 0.0F, shownW, BAR_H, BAR_W, BAR_H);
             // a soft shine sweeping along it
             int sweep = (int) ((now / 9L) % (BAR_W + 60)) - 30;
             for (int d = -8; d <= 8; d++) {
@@ -406,7 +406,7 @@ public final class BossBarFx {
             }
         }
         notches(g, overlay, bx, by);
-        g.blit(RenderType::guiTextured, style.front, fx, fy, 0.0F, 0.0F, FRAME_W, FRAME_H, FRAME_W, FRAME_H, 0xFFFFFFFF);
+        g.blit(RenderPipelines.GUI_TEXTURED, style.front, fx, fy, 0.0F, 0.0F, FRAME_W, FRAME_H, FRAME_W, FRAME_H, 0xFFFFFFFF);
 
         particles(g, st, fx, fy, now, dt);
 
@@ -423,14 +423,14 @@ public final class BossBarFx {
         // cyber tick marks running off the plate
         g.fill(cx - tw / 2 - 16, py + 5, cx - tw / 2 - 8, py + 6, Draw.argb(style.neon, 0.6F));
         g.fill(cx + tw / 2 + 8, py + 5, cx + tw / 2 + 16, py + 6, Draw.argb(style.neon, 0.6F));
-        g.drawString(font, name, cx - tw / 2, py + 2, Draw.argb(mix(style.neon, 0xFFFFFF, 0.55F), 1.0F), true);
+        g.text(font, name, cx - tw / 2, py + 2, Draw.argb(mix(style.neon, 0xFFFFFF, 0.55F), 1.0F), true);
     }
 
-    private static void frame(GuiGraphics g, Style style, int x, int y, int color) {
-        g.blit(RenderType::guiTextured, style.texture, x, y, 0.0F, 0.0F, FRAME_W, FRAME_H, FRAME_W, FRAME_H, color);
+    private static void frame(GuiGraphicsExtractor g, Style style, int x, int y, int color) {
+        g.blit(RenderPipelines.GUI_TEXTURED, style.texture, x, y, 0.0F, 0.0F, FRAME_W, FRAME_H, FRAME_W, FRAME_H, color);
     }
 
-    private static void notches(GuiGraphics g, BossEvent.BossBarOverlay overlay, int bx, int by) {
+    private static void notches(GuiGraphicsExtractor g, BossEvent.BossBarOverlay overlay, int bx, int by) {
         int n = switch (overlay) {
             case NOTCHED_6 -> 6;
             case NOTCHED_10 -> 10;
@@ -448,7 +448,7 @@ public final class BossBarFx {
     // ------------------------------------------------------------------
     // particles
     // ------------------------------------------------------------------
-    private static void particles(GuiGraphics g, State st, int fx, int fy, long now, float dt) {
+    private static void particles(GuiGraphicsExtractor g, State st, int fx, int fy, long now, float dt) {
         float rate = switch (st.style) {
             case DRAGON -> 26.0F;
             case GENERIC -> 6.0F;
@@ -556,7 +556,7 @@ public final class BossBarFx {
         float cy = BAR_Y + BAR_H / 2.0F;
         int tile = 16;
         // frame and emblem cut into 16x16 tiles
-        for (ResourceLocation tex : new ResourceLocation[] {style.texture, style.front}) {
+        for (Identifier tex : new Identifier[] {style.texture, style.front}) {
             for (int ty = 0; ty < FRAME_H; ty += tile) {
                 for (int tx = 0; tx < FRAME_W; tx += tile) {
                     b.shards.add(shard(tex, tx, ty, tile, tile, FRAME_W, FRAME_H, tx, ty, cx, cy, 1.0F));
@@ -587,7 +587,7 @@ public final class BossBarFx {
         return b;
     }
 
-    private static Shard shard(ResourceLocation tex, int u, int v, int w, int h, int texW, int texH,
+    private static Shard shard(Identifier tex, int u, int v, int w, int h, int texW, int texH,
                                int x, int y, float cx, float cy, float boost) {
         Shard s = new Shard();
         s.tex = tex;
@@ -609,7 +609,7 @@ public final class BossBarFx {
         return s;
     }
 
-    private static void renderBursts(GuiGraphics g, Font font, int sw, long now, float dt) {
+    private static void renderBursts(GuiGraphicsExtractor g, Font font, int sw, long now, float dt) {
         for (int i = BURSTS.size() - 1; i >= 0; i--) {
             Burst b = BURSTS.get(i);
             long t = now - b.at;
@@ -621,9 +621,6 @@ public final class BossBarFx {
             float fade = t > 900L ? 1.0F - (t - 900L) / (float) (BURST_MS - 900L) : 1.0F;
             int neon = b.style.neon;
 
-            g.pose().pushPose();
-            g.pose().translate(0.0F, 0.0F, 250.0F);
-
             // the bar line flares out across the whole screen
             if (t < 420L) {
                 float f = 1.0F - t / 420.0F;
@@ -633,17 +630,17 @@ public final class BossBarFx {
                 g.fill(Math.round(b.x) - half, ly - 3, Math.round(b.x) + half, ly + 3, Draw.argb(neon, 0.35F * f));
             }
 
-            g.pose().pushPose();
-            g.pose().translate(b.x, b.y, 0.0F);
-            g.pose().scale(SCALE, SCALE, 1.0F);
-            g.pose().translate(-FRAME_W / 2.0F, 0.0F, 0.0F);
+            g.pose().pushMatrix();
+            g.pose().translate(b.x, b.y);
+            g.pose().scale(SCALE, SCALE);
+            g.pose().translate(-FRAME_W / 2.0F, 0.0F);
 
             if (t < 140L) {
                 // overload: the intact bar flickers white, sliced by glitches
                 for (int s = 0; s < FRAME_H; s += 4) {
                     int off = RANDOM.nextInt(5) == 0 ? (RANDOM.nextInt(13) - 6) : 0;
-                    g.blit(RenderType::guiTextured, b.style.texture, off, s, 0.0F, s, FRAME_W, 4, FRAME_W, FRAME_H, 0xFFFFFFFF);
-                    g.blit(RenderType::guiTextured, b.style.front, off, s, 0.0F, s, FRAME_W, 4, FRAME_W, FRAME_H, 0xFFFFFFFF);
+                    g.blit(RenderPipelines.GUI_TEXTURED, b.style.texture, off, s, 0.0F, s, FRAME_W, 4, FRAME_W, FRAME_H, 0xFFFFFFFF);
+                    g.blit(RenderPipelines.GUI_TEXTURED, b.style.front, off, s, 0.0F, s, FRAME_W, 4, FRAME_W, FRAME_H, 0xFFFFFFFF);
                 }
                 g.fill(0, 0, FRAME_W, FRAME_H, Draw.argb(0xFFFFFF, 0.55F * (1.0F - t / 140.0F)));
             } else {
@@ -706,27 +703,26 @@ public final class BossBarFx {
                 int ty = BAR_Y - 4;
                 boolean flicker = (t / 50L) % 9L == 0L;
                 g.fill(tx - 4, ty - 2, tx + tw + 4, ty + 10, Draw.argb(0x07060C, 0.8F * fade));
-                g.drawString(font, shown, tx + (flicker ? 1 : 0), ty, Draw.argb(flicker ? Draw.CYAN : Draw.RED, fade), true);
+                g.text(font, shown, tx + (flicker ? 1 : 0), ty, Draw.argb(flicker ? Draw.CYAN : Draw.RED, fade), true);
             }
 
-            g.pose().popPose();
-            g.pose().popPose();
+            g.pose().popMatrix();
             if (k >= 1.0F) {
                 BURSTS.remove(i);
             }
         }
     }
 
-    private static void drawShard(GuiGraphics g, Shard s, float x, float y, float rot, float scale, int color) {
+    private static void drawShard(GuiGraphicsExtractor g, Shard s, float x, float y, float rot, float scale, int color) {
         if (scale <= 0.01F) {
             return;
         }
-        g.pose().pushPose();
-        g.pose().translate(x, y, 0.0F);
-        g.pose().mulPose(Axis.ZP.rotationDegrees(rot));
-        g.pose().scale(scale, scale, 1.0F);
-        g.blit(RenderType::guiTextured, s.tex, -s.w / 2, -s.h / 2, (float) s.u, (float) s.v, s.w, s.h, s.texW, s.texH, color);
-        g.pose().popPose();
+        g.pose().pushMatrix();
+        g.pose().translate(x, y);
+        g.pose().rotate((float) Math.toRadians(rot));
+        g.pose().scale(scale, scale);
+        g.blit(RenderPipelines.GUI_TEXTURED, s.tex, -s.w / 2, -s.h / 2, (float) s.u, (float) s.v, s.w, s.h, s.texW, s.texH, color);
+        g.pose().popMatrix();
     }
 
     // ------------------------------------------------------------------
@@ -752,7 +748,7 @@ public final class BossBarFx {
 
     private static final long VICTORY_MS = 3800L;
 
-    private static void renderVictory(GuiGraphics g, Font font, int sw, int sh, long now) {
+    private static void renderVictory(GuiGraphicsExtractor g, Font font, int sw, int sh, long now) {
         if (victoryAt == 0L) {
             return;
         }
@@ -765,9 +761,6 @@ public final class BossBarFx {
         int cx = sw / 2;
         int cy = Math.round(sh * 0.30F);
         int scale = Math.max(3, Math.min(6, sh / 60));
-
-        g.pose().pushPose();
-        g.pose().translate(0.0F, 0.0F, 300.0F);
 
         // light beams behind the letters
         for (int i = -5; i <= 5; i++) {
@@ -803,12 +796,13 @@ public final class BossBarFx {
                 angle = (float) Math.sin((now - victoryAt) / 380.0 + i) * 12.0F;
             }
             float lx = cx + (i == 0 ? -(letterW + gap) / 2.0F : (letterW + gap) / 2.0F);
-            g.pose().pushPose();
-            g.pose().translate(lx, cy, 0.0F);
-            g.pose().mulPose(Axis.YP.rotationDegrees(angle));
-            g.pose().scale(zoom, zoom, 1.0F);
+            g.pose().pushMatrix();
+            g.pose().translate(lx, cy);
+            // the GUI pose is 2D: a turn around the vertical axis is a horizontal squash
+            float turn = (float) Math.cos(Math.toRadians(angle));
+            g.pose().scale(zoom * Math.max(0.04F, Math.abs(turn)), zoom);
             drawLetter(g, -letterW / 2, -letterW / 2, scale, fade * Math.min(1.0F, lt / 150.0F), now);
-            g.pose().popPose();
+            g.pose().popMatrix();
         }
 
         // glitch slices across the letters
@@ -825,16 +819,15 @@ public final class BossBarFx {
             int ty = cy + letterW + 8;
             int tw = font.width(title);
             g.fill(cx - tw / 2 - 4, ty - 2, cx + tw / 2 + 4, ty + 10, Draw.argb(Draw.BG, 0.75F * fade));
-            g.drawString(font, title, cx - tw / 2, ty, Draw.argb(Draw.YELLOW, fade), true);
+            g.text(font, title, cx - tw / 2, ty, Draw.argb(Draw.YELLOW, fade), true);
             if (!victoryName.isEmpty() && t > 900L) {
                 int nw = font.width(victoryName);
-                g.drawString(font, victoryName, cx - nw / 2, ty + 13, Draw.argb(mix(victoryColor, 0xFFFFFF, 0.4F), fade), true);
+                g.text(font, victoryName, cx - nw / 2, ty + 13, Draw.argb(mix(victoryColor, 0xFFFFFF, 0.4F), fade), true);
             }
         }
-        g.pose().popPose();
     }
 
-    private static void drawLetter(GuiGraphics g, int x0, int y0, int s, float alpha, long now) {
+    private static void drawLetter(GuiGraphicsExtractor g, int x0, int y0, int s, float alpha, long now) {
         if (alpha <= 0.01F) {
             return;
         }
@@ -864,7 +857,7 @@ public final class BossBarFx {
         }
     }
 
-    private static void glyph(GuiGraphics g, int x0, int y0, int s, int color) {
+    private static void glyph(GuiGraphicsExtractor g, int x0, int y0, int s, int color) {
         for (int r = 0; r < 8; r++) {
             for (int c = 0; c < 8; c++) {
                 if (GLYPH_G[r].charAt(c) == '#') {

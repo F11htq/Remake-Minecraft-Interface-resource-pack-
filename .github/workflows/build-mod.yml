@@ -5,6 +5,7 @@ on:
     paths:
       - "mod/**"
       - ".github/workflows/build-mod.yml"
+      - ".github/scripts/**"
   workflow_dispatch:
 
 permissions:
@@ -19,46 +20,18 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: "21"
+          java-version: "25"
 
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: "8.12.1"
+          gradle-version: "9.8.2"
 
       - name: Build
         working-directory: mod
         run: gradle build --stacktrace
 
       - name: Check Minecraft signatures used by mixins
-        if: always()
-        run: |
-          JAR=$(find ~/.gradle/caches/fabric-loom -name "minecraft-merged-*1.21.4*.jar" | grep -v sources | head -n 1)
-          check() { javap -p -cp "$JAR" "$1" | grep -E "$2" || echo "MISSING in $1: $2"; }
-          check net.minecraft.client.gui.screens.Screen "renderWithTooltip"
-          check net.minecraft.client.Minecraft "void setScreen|Screen screen;"
-          check net.minecraft.client.gui.GuiGraphics "void (blit|fill)\\("
-          check net.minecraft.client.renderer.CubeMap "sides"
-          check net.minecraft.client.renderer.texture.TextureManager "register|getTexture"
-          check net.minecraft.client.renderer.texture.DynamicTexture "DynamicTexture\\("
-          check net.minecraft.client.gui.components.AbstractWidget "setWidth|getMessage"
-          check net.minecraft.client.gui.screens.inventory.AbstractContainerScreen "renderSlotHighlight|hoveredSlot|leftPos|topPos|imageWidth|imageHeight| render\\(| init\\("
-          check net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen "selectTab|scrollOffs|renderBg| render\\("
-          check net.minecraft.world.inventory.Slot "isHighlightable|isActive"
-          check com.mojang.blaze3d.systems.RenderSystem "void setShaderColor"
-          check net.minecraft.client.gui.GuiGraphics "void flush|enableScissor|disableScissor"
-          check net.minecraft.client.gui.components.BossHealthOverlay "events|void render"
-          check net.minecraft.client.gui.components.LerpingBossEvent "getProgress"
-          check net.minecraft.client.multiplayer.ClientLevel "entitiesForRendering"
-          check net.minecraft.client.renderer.blockentity.BeaconRenderer "renderBeaconBeam|shouldRenderOffScreen|getViewDistance"
-          check net.minecraft.client.renderer.blockentity.TheEndPortalRenderer "render|shouldRender|getViewDistance"
-          check net.minecraft.client.renderer.blockentity.BlockEntityRenderer "render|shouldRender|getViewDistance"
-          check com.mojang.blaze3d.vertex.VertexConsumer "addVertex\\(|setColor\\("
-          check net.minecraft.client.renderer.RenderType "lightning|beaconBeam|debugQuads"
-          check net.minecraft.client.multiplayer.ClientLevel "void addParticle|void addAlwaysVisibleParticle"
-          check net.minecraft.world.level.Level "dimension\\(|END;"
-          check net.minecraft.client.renderer.LevelRenderer " renderLevel\\("
-          check net.minecraft.client.Camera "void setup|setRotation|getXRot|getYRot"
-          check net.minecraft.sounds.SoundEvents "LIGHTNING_BOLT_THUNDER|LIGHTNING_BOLT_IMPACT"
+        run: bash .github/scripts/check-mixin-targets.sh
 
       - name: Upload jar
         uses: actions/upload-artifact@v4
@@ -71,10 +44,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           JAR=$(ls mod/build/libs/*.jar | grep -v -- '-sources' | head -n 1)
-          cp "$JAR" cyber-ui-mod-1.21.4.jar
+          cp "$JAR" cyber-ui-mod-26.3.jar
           gh release delete mod-latest --cleanup-tag --yes || true
-          gh release create mod-latest cyber-ui-mod-1.21.4.jar \
+          gh release create mod-latest cyber-ui-mod-26.3.jar \
             --target "$GITHUB_SHA" \
             --prerelease \
             --title "CYBER//UI mod (latest build)" \
-            --notes "Fabric 1.21.4. Put the jar into the mods folder. Built from ${GITHUB_SHA}."
+            --notes "Fabric 26.3 (Java 25). Put the jar into the mods folder. Built from ${GITHUB_SHA}."

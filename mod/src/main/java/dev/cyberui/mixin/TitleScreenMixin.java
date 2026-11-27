@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.cyberui.client.LogoFx;
-import dev.cyberui.client.Panoramas;
 import dev.cyberui.client.TitleLayout;
-import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Util;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -39,7 +38,6 @@ public abstract class TitleScreenMixin extends Screen {
         if (this.cyberui$openedAt == 0L) {
             // first time this title screen is shown: play the slide-in
             this.cyberui$openedAt = Util.getMillis();
-            Panoramas.apply();
         }
         this.cyberui$relayout();
     }
@@ -50,8 +48,8 @@ public abstract class TitleScreenMixin extends Screen {
         this.cyberui$childCount = this.children().size();
     }
 
-    @Inject(method = "render", at = @At("HEAD"))
-    private void cyberui$animate(GuiGraphics g, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"))
+    private void cyberui$animate(GuiGraphicsExtractor g, int mouseX, int mouseY, float a, CallbackInfo ci) {
         // other mods (e.g. Mod Menu) may add buttons after our init hook ran
         if (this.children().size() != this.cyberui$childCount) {
             this.cyberui$relayout();
@@ -59,21 +57,21 @@ public abstract class TitleScreenMixin extends Screen {
         TitleLayout.animate(this.cyberui$placed, this.cyberui$openedAt);
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
-    private void cyberui$decor(GuiGraphics g, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("TAIL"))
+    private void cyberui$decor(GuiGraphicsExtractor g, int mouseX, int mouseY, float a, CallbackInfo ci) {
         TitleLayout.renderDecor(g, this.width, this.height, this.cyberui$openedAt);
     }
 
     /** Draw the logo at the left, with glow, chromatic split, glitches and an intro. */
-    @Redirect(method = "render", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/components/LogoRenderer;renderLogo(Lnet/minecraft/client/gui/GuiGraphics;IF)V"))
-    private void cyberui$logoFx(LogoRenderer logo, GuiGraphics g, int screenWidth, float alpha) {
-        LogoFx.render(logo, g, alpha, this.cyberui$openedAt);
+    @Redirect(method = "extractRenderState", at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/components/LogoRenderer;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IF)V"))
+    private void cyberui$logoFx(LogoRenderer logo, GuiGraphicsExtractor g, int screenWidth, float alpha) {
+        LogoFx.render(g, alpha, this.cyberui$openedAt);
     }
 
     /** Keep the splash text next to the moved logo. */
-    @ModifyArg(method = "render", index = 1, at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/components/SplashRenderer;render(Lnet/minecraft/client/gui/GuiGraphics;ILnet/minecraft/client/gui/Font;I)V"))
+    @ModifyArg(method = "extractRenderState", index = 1, at = @At(value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/components/SplashRenderer;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;ILnet/minecraft/client/gui/Font;F)V"))
     private int cyberui$splashAtLeft(int screenWidth) {
         return TitleLayout.LOGO_FAKE_WIDTH;
     }

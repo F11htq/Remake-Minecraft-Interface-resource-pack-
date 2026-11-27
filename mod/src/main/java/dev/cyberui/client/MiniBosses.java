@@ -10,6 +10,7 @@ import java.util.UUID;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 
 /**
@@ -35,21 +36,26 @@ public final class MiniBosses {
     private static final double APPROACH_RANGE = 16.0;
     private static final long ENGAGED_MS = 20000L;
 
+    /** The entity list is scanned at most this often; the bars themselves update every frame. */
+    private static final long SCAN_EVERY_MS = 100L;
+
     private static final Map<UUID, Track> TRACKS = new HashMap<>();
+    private static final List<LivingEntity> SHOWN = new ArrayList<>();
+    private static long lastScan = 0L;
 
     private MiniBosses() {
     }
 
     static BossBarFx.Style styleOf(EntityType<?> type) {
-        if (type == EntityType.WARDEN) {
+        if (type == EntityTypes.WARDEN) {
             return BossBarFx.Style.WARDEN;
-        } else if (type == EntityType.IRON_GOLEM) {
+        } else if (type == EntityTypes.IRON_GOLEM) {
             return BossBarFx.Style.GOLEM;
-        } else if (type == EntityType.RAVAGER) {
+        } else if (type == EntityTypes.RAVAGER) {
             return BossBarFx.Style.RAVAGER;
-        } else if (type == EntityType.EVOKER) {
+        } else if (type == EntityTypes.EVOKER) {
             return BossBarFx.Style.EVOKER;
-        } else if (type == EntityType.GUARDIAN || type == EntityType.ELDER_GUARDIAN) {
+        } else if (type == EntityTypes.GUARDIAN || type == EntityTypes.ELDER_GUARDIAN) {
             return BossBarFx.Style.GUARDIAN;
         }
         return null;
@@ -57,13 +63,13 @@ public final class MiniBosses {
 
     /** Mobs dangerous enough to show their bar as soon as they are close. */
     private static boolean showsOnApproach(EntityType<?> type) {
-        return type == EntityType.WARDEN || type == EntityType.RAVAGER
-                || type == EntityType.EVOKER || type == EntityType.ELDER_GUARDIAN;
+        return type == EntityTypes.WARDEN || type == EntityTypes.RAVAGER
+                || type == EntityTypes.EVOKER || type == EntityTypes.ELDER_GUARDIAN;
     }
 
     /** Common mobs do not get the GG victory screen. */
     private static boolean earnsGg(EntityType<?> type) {
-        return type != EntityType.GUARDIAN;
+        return type != EntityTypes.GUARDIAN;
     }
 
     public static List<Entry> collect(long now) {
@@ -71,37 +77,51 @@ public final class MiniBosses {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) {
             TRACKS.clear();
+            SHOWN.clear();
             return out;
         }
-        List<LivingEntity> shown = new ArrayList<>();
-        for (Entity e : mc.level.entitiesForRendering()) {
-            if (!(e instanceof LivingEntity mob) || styleOf(e.getType()) == null) {
-                continue;
-            }
-            double dist = Math.sqrt(e.distanceToSqr(mc.player));
-            if (dist > SCAN_RANGE) {
-                continue;
-            }
-            Track t = TRACKS.computeIfAbsent(e.getUUID(), id -> new Track());
-            float hp = mob.getHealth();
-            if (t.lastHp >= 0.0F && hp < t.lastHp - 0.01F && dist < ENGAGE_RANGE) {
-                t.engagedUntil = now + ENGAGED_MS;
-            }
-            t.lastHp = hp;
-            t.seen = now;
-            if (now < t.engagedUntil || (showsOnApproach(e.getType()) && dist < APPROACH_RANGE && mob.isAlive())) {
-                shown.add(mob);
-            }
+        if (now - lastScan >= SCAN_EVERY_MS || now < lastScan) {
+            lastScan = now;
+            scan(mc, now);
         }
-        TRACKS.values().removeIf(t -> now - t.seen > 1000L);
-
-        shown.sort(Comparator.comparingDouble(m -> m.distanceToSqr(mc.player)));
-        for (int i = 0; i < Math.min(MAX_BARS, shown.size()); i++) {
-            LivingEntity mob = shown.get(i);
+        for (int i = 0; i < Math.min(MAX_BARS, SHOWN.size()); i++) {
+            LivingEntity mob = SHOWN.get(i);
+            if (mob.isRemoved() || mob.level() != mc.level) {
+                // gone: BossBarFx counts a bar that vanished while almost dead as a win
+                continue;
+            }
             float max = Math.max(1.0F, mob.getMaxHealth());
             float progress = mob.isDeadOrDying() ? 0.0F : mob.getHealth() / max;
             out.add(new Entry(mob.getUUID(), mob, styleOf(mob.getType()), progress, earnsGg(mob.getType())));
         }
         return out;
+    }
+
+    private static void scan(Minecraft mc, long now) {
+        SHOWN.clear();
+        double scan2 = SCAN_RANGE * SCAN_RANGE;
+        double engage2 = ENGAGE_RANGE * ENGAGE_RANGE;
+        double approach2 = APPROACH_RANGE * APPROACH_RANGE;
+        for (Entity e : mc.level.entitiesForRendering()) {
+            if (!(e instanceof LivingEntity mob) || styleOf(e.getType()) == null) {
+                continue;
+            }
+            double dist2 = e.distanceToSqr(mc.player);
+            if (dist2 > scan2) {
+                continue;
+            }
+            Track t = TRACKS.computeIfAbsent(e.getUUID(), id -> new Track());
+            float hp = mob.getHealth();
+            if (t.lastHp >= 0.0F && hp < t.lastHp - 0.01F && dist2 < engage2) {
+                t.engagedUntil = now + ENGAGED_MS;
+            }
+            t.lastHp = hp;
+            t.seen = now;
+            if (now < t.engagedUntil || (showsOnApproach(e.getType()) && dist2 < approach2 && mob.isAlive())) {
+                SHOWN.add(mob);
+            }
+        }
+        TRACKS.values().removeIf(t -> now - t.seen > 1000L);
+        SHOWN.sort(Comparator.comparingDouble(m -> m.distanceToSqr(mc.player)));
     }
 }

@@ -3,7 +3,7 @@
   "id": "cyberui",
   "version": "${version}",
   "name": "CYBER//UI",
-  "description": "Cyberpunk title screen, loading screen and smooth inventories: animated left-aligned buttons, glitching logo, SYS//STAT panel, screen transitions, a custom loading screen and gliding slot highlights. Pairs with the CYBER//UI resource pack. Not an official Minecraft product.",
+  "description": "Cyberpunk title screen, loading screen, hotbar and smooth inventories: animated left-aligned buttons, glitching logo, SYS//STAT panel, screen transitions, a custom loading screen, an animated hotbar and gliding slot highlights. Pairs with the CYBER//UI resource pack. Not an official Minecraft product.",
   "authors": [
     "f11htq"
   ],
@@ -17,8 +17,8 @@
     "cyberui.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.16.0",
-    "minecraft": "1.21.4",
-    "java": ">=21"
+    "fabricloader": ">=0.20.0",
+    "minecraft": "~26.3",
+    "java": ">=25"
   }
 }

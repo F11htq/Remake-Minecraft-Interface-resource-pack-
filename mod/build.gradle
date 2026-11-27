@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version "${loom_version}"
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
 }
 
 version = "${project.mod_version}+mc${project.minecraft_version}"
@@ -9,20 +9,10 @@ base {
     archivesName = project.archives_base_name
 }
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
+    // 26.x ships unobfuscated: no mappings, no remapping
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-}
-
-loom {
-    mixin {
-        defaultRefmapName = "cyberui.refmap.json"
-    }
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 }
 
 jar {
@@ -30,17 +20,18 @@ jar {
 }
 
 processResources {
-    inputs.property "version", project.version
+    def version = project.version
+    inputs.property "version", version
     filesMatching("fabric.mod.json") {
-        expand "version": project.version
+        expand "version": version
     }
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+    it.options.release = 25
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 }

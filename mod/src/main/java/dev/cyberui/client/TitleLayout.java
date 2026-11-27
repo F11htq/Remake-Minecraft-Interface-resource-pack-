@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.Util;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * Title screen: buttons in a left-aligned column that slide in one after
@@ -29,8 +29,8 @@ public final class TitleLayout {
     private static final int SLIDE_MS = 520;
     private static final int STAGGER_MS = 90;
 
-    private static final ResourceLocation STATUS_PANEL =
-            ResourceLocation.fromNamespaceAndPath("cyberui", "textures/gui/status_panel.png");
+    private static final Identifier STATUS_PANEL =
+            Identifier.fromNamespaceAndPath("cyberui", "textures/gui/status_panel.png");
     private static final int PANEL_W = 140;
     private static final int PANEL_H = 92;
     private static final int PANEL_FRAMES = 16;
@@ -131,14 +131,14 @@ public final class TitleLayout {
     }
 
     /** SYS//STAT panel sliding in from the right and the bottom hazard strip. */
-    public static void renderDecor(GuiGraphics g, int width, int height, long openedAt) {
+    public static void renderDecor(GuiGraphicsExtractor g, int width, int height, long openedAt) {
         long now = Util.getMillis();
         float t = (now - openedAt - 350L) / 520.0F;
         int slide = Math.round(220 * (1.0F - Draw.easeOut(t)));
         int x = width - PANEL_W - 16 + slide;
         int y = height / 2 - PANEL_H / 2;
         int frame = (int) ((now / 120L) % PANEL_FRAMES);
-        g.blit(RenderType::guiTextured, STATUS_PANEL, x, y, 0.0F, (float) (frame * PANEL_H),
+        g.blit(RenderPipelines.GUI_TEXTURED, STATUS_PANEL, x, y, 0.0F, (float) (frame * PANEL_H),
                 PANEL_W, PANEL_H, PANEL_W, PANEL_H * PANEL_FRAMES);
         Draw.hazard(g, 0, height - 3, width, 3, 1.0F, now);
     }

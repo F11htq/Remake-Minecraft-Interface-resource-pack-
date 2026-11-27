@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Packs the resource pack into a ready-to-use zip (CYBER-UI-1.21.4.zip)."""
+"""Packs the resource pack into a ready-to-use zip (CYBER-UI-26.3.zip)."""
 
 import os
 import zipfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "CYBER-UI-1.21.4.zip")
+OUT = os.path.join(ROOT, "CYBER-UI-26.3.zip")
 
 
 def main():

@@ -107,21 +107,9 @@ def build_status_panel():
         x = text(img, 6, 70, "> JACK_IN", rgba(YELLOW))
         if i % 4 < 2:
             rect(img, x, 70, x + 2, 74, rgba(YELLOW))
-        text(img, 6, 80, "V1.21.4 // CYBER-UI", rgba((90, 90, 100)))
+        text(img, 6, 80, "V26.3 // CYBER-UI", rgba((90, 90, 100)))
         frames.append(img)
     save(strip(frames), "status_panel.png")
-
-
-def build_hazard():
-    """64x4 hazard stripes, 8 frames stacked vertically (stripes crawl)."""
-    frames = []
-    for i in range(8):
-        img = new(64, 4)
-        for y in range(4):
-            for x in range(64):
-                img.putpixel((x, y), rgba(YELLOW if ((x + y + i) // 4) % 2 == 0 else BLACK))
-        frames.append(img)
-    save(strip(frames), "hazard.png")
 
 
 def build_loading_logo():
@@ -183,13 +171,13 @@ def build_mod_icon():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--panoramas", required=True)
+    ap.add_argument("--panoramas", help="folder with a 1.21.4 sub-folder of vanilla panorama_0..5.png; skipped when omitted")
     args = ap.parse_args()
     build_status_panel()
-    build_hazard()
     build_loading_logo()
     build_boss_frames()
-    build_panoramas(args.panoramas)
+    if args.panoramas:
+        build_panoramas(args.panoramas)
     build_mod_icon()
 
 

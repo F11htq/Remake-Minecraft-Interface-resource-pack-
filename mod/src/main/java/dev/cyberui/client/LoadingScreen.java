@@ -3,12 +3,12 @@ package dev.cyberui.client;
 import java.io.InputStream;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * The loading screen (replaces the red Mojang Studios screen). The logo is
@@ -17,7 +17,7 @@ import net.minecraft.resources.ResourceLocation;
  */
 public final class LoadingScreen {
 
-    private static final ResourceLocation LOGO = ResourceLocation.fromNamespaceAndPath("cyberui", "loading_logo");
+    private static final Identifier LOGO = Identifier.fromNamespaceAndPath("cyberui", "loading_logo");
     private static final String LOGO_FILE = "/assets/cyberui/textures/gui/loading_logo.png";
     private static final String[] TASKS = {
         "LOADING TEXTURES", "LINKING SHADERS", "SYNCING SOUNDS", "DECRYPTING DATA", "BOOTING NEURAL LINK",
@@ -44,7 +44,7 @@ public final class LoadingScreen {
             NativeImage image = NativeImage.read(in);
             logoW = image.getWidth();
             logoH = image.getHeight();
-            Minecraft.getInstance().getTextureManager().register(LOGO, new DynamicTexture(image));
+            Minecraft.getInstance().getTextureManager().register(LOGO, new DynamicTexture(() -> "cyberui loading logo", image));
             logoReady = true;
         } catch (Exception e) {
             logoReady = false;
@@ -53,12 +53,10 @@ public final class LoadingScreen {
 
     /**
      * @param alpha     element opacity (follows the vanilla fade)
-     * @param opaqueBg  whether to paint the background (vanilla only cleared the screen)
      * @param progress  smoothed loading progress 0..1
-     * @param bar       progress bar rectangle {x0, y0, x1, y1} from vanilla, or null
-     * @param barAlpha  progress bar opacity
+     * @param barAlpha  progress bar opacity (0 once vanilla stops drawing its bar)
      */
-    public static void render(GuiGraphics g, float alpha, boolean opaqueBg, float progress, int[] bar, float barAlpha) {
+    public static void render(GuiGraphicsExtractor g, float alpha, float progress, float barAlpha) {
         long now = Util.getMillis();
         if (firstFrame == 0L) {
             firstFrame = now;
@@ -66,9 +64,6 @@ public final class LoadingScreen {
         int w = g.guiWidth();
         int h = g.guiHeight();
 
-        if (opaqueBg) {
-            g.fill(0, 0, w, h, Draw.argb(Draw.BG, 1.0F));
-        }
         renderGrid(g, w, h, alpha * 0.6F, now);
 
         // logo, dropping in from above, with an occasional colour-split glitch
@@ -95,10 +90,7 @@ public final class LoadingScreen {
         int bx0 = w / 2 - 100;
         int by = h / 2 + 18;
         int bw = 200;
-        float ba = alpha;
-        if (bar != null) {
-            ba = barAlpha * alpha;
-        }
+        float ba = barAlpha * alpha;
         if (ba > 0.01F) {
             renderBar(g, bx0, by, bw, 8, progress, ba, now);
             renderSpinner(g, bx0 - 14, by - 4, ba, now);
@@ -119,11 +111,11 @@ public final class LoadingScreen {
         Draw.hazard(g, 0, h - 3, w, 3, alpha, now);
     }
 
-    private static void logo(GuiGraphics g, int x, int y, int w, int h, int color) {
-        g.blit(RenderType::guiTextured, LOGO, x, y, 0.0F, 0.0F, w, h, logoW, logoH, logoW, logoH, color);
+    private static void logo(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
+        g.blit(RenderPipelines.GUI_TEXTURED, LOGO, x, y, 0.0F, 0.0F, w, h, logoW, logoH, logoW, logoH, color);
     }
 
-    private static void renderGrid(GuiGraphics g, int w, int h, float alpha, long now) {
+    private static void renderGrid(GuiGraphicsExtractor g, int w, int h, float alpha, long now) {
         int line = Draw.argb(0x18160E, alpha);
         for (int x = 0; x < w; x += 24) {
             g.fill(x, 0, x + 1, h, line);
@@ -140,19 +132,27 @@ public final class LoadingScreen {
         g.fill(0, sweep, w, sweep + 1, Draw.argb(Draw.YELLOW, alpha * 0.45F));
     }
 
-    private static void renderBar(GuiGraphics g, int x, int y, int w, int h, float progress, float alpha, long now) {
+    private static void renderBar(GuiGraphicsExtractor g, int x, int y, int w, int h, float progress, float alpha, long now) {
         Draw.rect(g, x, y, w, h, Draw.argb(Draw.BG, alpha * 0.9F));
         Draw.frame(g, x, y, w, h, Draw.argb(Draw.YELLOW, alpha));
         Draw.rect(g, x, y, 4, 2, Draw.argb(Draw.RED, alpha));
         int fill = Math.round((w - 4) * Draw.clamp(progress, 0.0F, 1.0F));
         int shift = (int) ((now / 80L) % 6L);
-        for (int i = 0; i < fill; i++) {
-            boolean on = ((i + shift) / 3) % 2 == 0;
-            g.fill(x + 2 + i, y + 2, x + 3 + i, y + h - 2, Draw.argb(on ? Draw.YELLOW : Draw.DARK_YELLOW, alpha));
+        if (fill > 0) {
+            // dark base, then the bright 3-pixel stripes crawling along it
+            g.fill(x + 2, y + 2, x + 2 + fill, y + h - 2, Draw.argb(Draw.DARK_YELLOW, alpha));
+            int yellow = Draw.argb(Draw.YELLOW, alpha);
+            for (int i = -shift; i < fill; i += 6) {
+                int x0 = Math.max(0, i);
+                int x1 = Math.min(fill, i + 3);
+                if (x1 > x0) {
+                    g.fill(x + 2 + x0, y + 2, x + 2 + x1, y + h - 2, yellow);
+                }
+            }
         }
     }
 
-    private static void renderSpinner(GuiGraphics g, int x, int y, float alpha, long now) {
+    private static void renderSpinner(GuiGraphicsExtractor g, int x, int y, float alpha, long now) {
         int head = (int) ((now / 60L) % 12L);
         for (int seg = 0; seg < 12; seg++) {
             int age = (head - seg + 12) % 12;

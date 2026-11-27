@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import dev.cyberui.client.BossBarFx;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.BossHealthOverlay;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import org.spongepowered.asm.mixin.Final;
@@ -20,10 +20,10 @@ public abstract class BossHealthOverlayMixin {
 
     @Shadow
     @Final
-    Map<UUID, LerpingBossEvent> events;
+    private Map<UUID, LerpingBossEvent> events;
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    private void cyberui$render(GuiGraphics g, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
+    private void cyberui$render(GuiGraphicsExtractor g, CallbackInfo ci) {
         BossBarFx.render(g, this.events);
         ci.cancel();
     }

@@ -1,6 +1,6 @@
 package dev.cyberui.client;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 /**
  * Drawing helpers that only use plain fills, so they also work on the very
@@ -37,11 +37,11 @@ public final class Draw {
         return 1.0F - u * u * u;
     }
 
-    public static void rect(GuiGraphics g, int x, int y, int w, int h, int argb) {
+    public static void rect(GuiGraphicsExtractor g, int x, int y, int w, int h, int argb) {
         g.fill(x, y, x + w, y + h, argb);
     }
 
-    public static void frame(GuiGraphics g, int x, int y, int w, int h, int argb) {
+    public static void frame(GuiGraphicsExtractor g, int x, int y, int w, int h, int argb) {
         rect(g, x, y, w, 1, argb);
         rect(g, x, y + h - 1, w, 1, argb);
         rect(g, x, y, 1, h, argb);
@@ -49,7 +49,7 @@ public final class Draw {
     }
 
     /** Animated yellow/black hazard stripes. */
-    public static void hazard(GuiGraphics g, int x, int y, int w, int h, float alpha, long now) {
+    public static void hazard(GuiGraphicsExtractor g, int x, int y, int w, int h, float alpha, long now) {
         int shift = (int) ((now / 60L) % 8L);
         int yellow = argb(YELLOW, alpha);
         int black = argb(BLACK, alpha);
@@ -81,18 +81,30 @@ public final class Draw {
         "100010001010100", "000000000000111", "000000000000000",
     };
 
-    /** Draws text with the pixel font; returns the x after the text. */
-    public static int text(GuiGraphics g, int x, int y, String s, int scale, int argb) {
-        String up = s.toUpperCase();
+    /**
+     * Draws text with the pixel font; returns the x after the text. Each run of
+     * lit pixels in a glyph row is one fill, which keeps the number of GUI
+     * elements low (the loading screen draws a lot of this text every frame).
+     */
+    public static int text(GuiGraphicsExtractor g, int x, int y, String s, int scale, int argb) {
+        String up = s.toUpperCase(java.util.Locale.ROOT);
         for (int c = 0; c < up.length(); c++) {
             int idx = CHARS.indexOf(up.charAt(c));
             if (idx >= 0) {
                 String glyph = GLYPHS[idx];
-                for (int i = 0; i < 15; i++) {
-                    if (glyph.charAt(i) == '1') {
-                        int px = x + (i % 3) * scale;
-                        int py = y + (i / 3) * scale;
-                        g.fill(px, py, px + scale, py + scale, argb);
+                for (int row = 0; row < 5; row++) {
+                    int col = 0;
+                    while (col < 3) {
+                        if (glyph.charAt(row * 3 + col) != '1') {
+                            col++;
+                            continue;
+                        }
+                        int start = col;
+                        while (col < 3 && glyph.charAt(row * 3 + col) == '1') {
+                            col++;
+                        }
+                        int py = y + row * scale;
+                        g.fill(x + start * scale, py, x + col * scale, py + scale, argb);
                     }
                 }
             }

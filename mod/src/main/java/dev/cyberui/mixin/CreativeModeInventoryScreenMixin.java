@@ -1,9 +1,9 @@
 package dev.cyberui.mixin;
 
 import dev.cyberui.client.InventoryFx;
-import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.util.Util;
 import net.minecraft.world.item.CreativeModeTab;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,11 +34,13 @@ public abstract class CreativeModeInventoryScreenMixin {
     @Inject(method = "selectTab", at = @At("TAIL"))
     private void cyberui$tabChanged(CreativeModeTab tab, CallbackInfo ci) {
         this.cyberui$tabChangedAt = Util.getMillis();
+        // a new tab starts at its own scroll position, no glide from the old one
+        this.cyberui$shownScroll = -1.0F;
     }
 
     /** Draw the scroll thumb at a smoothed position, then restore the real value. */
-    @Inject(method = "renderBg", at = @At("HEAD"))
-    private void cyberui$smoothScrollStart(GuiGraphics g, float partialTick, int mouseX, int mouseY, CallbackInfo ci) {
+    @Inject(method = "extractBackground", at = @At("HEAD"))
+    private void cyberui$smoothScrollStart(GuiGraphicsExtractor g, int mouseX, int mouseY, float a, CallbackInfo ci) {
         long now = Util.getMillis();
         float dt = this.cyberui$lastFrame == 0L ? 0.016F : Math.min(0.1F, (now - this.cyberui$lastFrame) / 1000.0F);
         this.cyberui$lastFrame = now;
@@ -51,13 +53,13 @@ public abstract class CreativeModeInventoryScreenMixin {
         this.scrollOffs = this.cyberui$shownScroll;
     }
 
-    @Inject(method = "renderBg", at = @At("RETURN"))
-    private void cyberui$smoothScrollEnd(GuiGraphics g, float partialTick, int mouseX, int mouseY, CallbackInfo ci) {
+    @Inject(method = "extractBackground", at = @At("RETURN"))
+    private void cyberui$smoothScrollEnd(GuiGraphicsExtractor g, int mouseX, int mouseY, float a, CallbackInfo ci) {
         this.scrollOffs = this.cyberui$realScroll;
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
-    private void cyberui$tabFade(GuiGraphics g, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("TAIL"))
+    private void cyberui$tabFade(GuiGraphicsExtractor g, int mouseX, int mouseY, float a, CallbackInfo ci) {
         if (this.cyberui$tabChangedAt != 0L) {
             AbstractContainerScreenAccessor self = (AbstractContainerScreenAccessor) this;
             // item grid: 9 x 5 slots starting at (9, 18) inside the panel

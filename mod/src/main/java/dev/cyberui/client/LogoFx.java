@@ -1,9 +1,9 @@
 package dev.cyberui.client;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.Util;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.util.Util;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.LogoRenderer;
+import net.minecraft.client.renderer.RenderPipelines;
 
 /**
  * Effects for the "MINECRAFT / JAVA EDITION" logo on the title screen:
@@ -28,7 +28,7 @@ public final class LogoFx {
     private LogoFx() {
     }
 
-    public static void render(LogoRenderer logo, GuiGraphics g, float alpha, long openedAt) {
+    public static void render(GuiGraphicsExtractor g, float alpha, long openedAt) {
         long now = Util.getMillis();
         long age = now - openedAt;
         float intro = Draw.clamp(age / (float) INTRO_MS, 0.0F, 1.0F);
@@ -38,28 +38,29 @@ public final class LogoFx {
         float bob = (float) Math.sin(t * 1.6F) * 1.5F;
         float a = alpha * Draw.easeOut(intro * 1.4F);
 
-        g.pose().pushPose();
-        g.pose().translate(0.0F, bob, 0.0F);
+        g.pose().pushMatrix();
+        g.pose().translate(0.0F, bob);
 
         // neon glow: slightly enlarged yellow copies behind the logo
         float glow = (0.10F + 0.10F * pulse) * a;
         for (int i = 0; i < 2; i++) {
             float s = 1.012F + i * 0.012F;
-            g.pose().pushPose();
-            g.pose().translate(X0 + W / 2.0F, Y0 + H / 2.0F, 0.0F);
-            g.pose().scale(s, s, 1.0F);
-            g.pose().translate(-(X0 + W / 2.0F), -(Y0 + H / 2.0F), 0.0F);
-            tinted(logo, g, 1.0F, 0.93F, 0.04F, glow, 0, 0, a);
-            g.pose().popPose();
+            g.pose().pushMatrix();
+            g.pose().translate(X0 + W / 2.0F, Y0 + H / 2.0F);
+            g.pose().scale(s, s);
+            g.pose().translate(-(X0 + W / 2.0F), -(Y0 + H / 2.0F));
+            draw(g, 0, Draw.argb(0xFCEE0A, glow));
+            g.pose().popMatrix();
         }
 
         // chromatic split: red to the left, cyan to the right
         int split = burst ? 4 : 1;
         float splitAlpha = (burst ? 0.75F : 0.30F + 0.15F * pulse) * a;
-        tinted(logo, g, 1.0F, 0.0F, 0.24F, splitAlpha, -split, 0, a);
-        tinted(logo, g, 0.0F, 0.94F, 1.0F, splitAlpha, split, 0, a);
+        draw(g, -split, Draw.argb(0xFF003C, splitAlpha));
+        draw(g, split, Draw.argb(0x00F0FF, splitAlpha));
 
         // main logo: assembled from sliding bands during the intro and glitch bursts
+        int white = Draw.argb(0xFFFFFF, a);
         if (intro < 1.0F || burst) {
             float spread = burst ? 0.35F : 1.0F - Draw.easeOut(intro);
             long seed = burst ? age / BURST_EVERY_MS : 7L;
@@ -70,11 +71,11 @@ public final class LogoFx {
                 int dx = Math.round((float) (r * 2.0 - 1.0) * 60.0F * spread);
                 int y = Y0 + b * bandH;
                 g.enableScissor(0, y, g.guiWidth(), y + bandH);
-                draw(logo, g, dx, 0, a);
+                draw(g, dx, white);
                 g.disableScissor();
             }
         } else {
-            draw(logo, g, 0, 0, a);
+            draw(g, 0, white);
         }
 
         // scan line sweeping across the logo
@@ -87,26 +88,19 @@ public final class LogoFx {
             g.fill(X0, sy - 2, X0 + W, sy, Draw.argb(Draw.YELLOW, 0.20F * sa));
         }
 
-        g.pose().popPose();
+        g.pose().popMatrix();
     }
 
-    private static void draw(LogoRenderer logo, GuiGraphics g, int dx, int dy, float alpha) {
-        g.pose().pushPose();
-        g.pose().translate(dx, dy, 0.0F);
-        logo.renderLogo(g, TitleLayout.LOGO_FAKE_WIDTH, alpha);
-        g.pose().popPose();
-    }
-
-    /** Draws the logo multiplied by a colour (flushes so the shader colour applies). */
-    private static void tinted(LogoRenderer logo, GuiGraphics g, float r, float gr, float b, float a,
-                               int dx, int dy, float alpha) {
-        if (a <= 0.01F) {
+    /**
+     * Draws the logo and the edition banner like LogoRenderer does, shifted by dx
+     * and multiplied by a colour (the GUI pipeline tints textures by the vertex colour).
+     */
+    private static void draw(GuiGraphicsExtractor g, int dx, int color) {
+        if ((color >>> 24) < 3) {
             return;
         }
-        g.flush();
-        RenderSystem.setShaderColor(r, gr, b, a);
-        draw(logo, g, dx, dy, alpha);
-        g.flush();
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        int cx = TitleLayout.LOGO_FAKE_WIDTH / 2;
+        g.blit(RenderPipelines.GUI_TEXTURED, LogoRenderer.MINECRAFT_LOGO, cx - 128 + dx, 30, 0.0F, 0.0F, 256, 44, 256, 64, color);
+        g.blit(RenderPipelines.GUI_TEXTURED, LogoRenderer.MINECRAFT_EDITION, cx - 64 + dx, 30 + 44 - 7, 0.0F, 0.0F, 128, 14, 128, 16, color);
     }
 }

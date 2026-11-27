@@ -1,11 +1,11 @@
 <!-- Modrinth project: CYBER//UI (Resource Pack)
 Summary (short description field):
-A black, yellow and red cyberpunk redesign of every Minecraft menu and inventory. Animated buttons, glitching tooltips, targeting slot highlights. The world and HUD stay vanilla.
+A black, yellow and red cyberpunk redesign of every Minecraft menu and inventory. Animated buttons, glitching tooltips, targeting slot highlights, an armoured hotbar. The world and the rest of the HUD stay vanilla.
 -->
 
 # CYBER//UI
 
-A cyberpunk redesign of **menus and interfaces only** for Minecraft 1.21.4. Blocks, mobs, the world and the in-game HUD (hotbar, hearts, XP bar, crosshair) stay exactly as they are; only boss health bars get the CYBER//UI look.
+A cyberpunk redesign of **menus and interfaces only** for Minecraft 26.3. Blocks, mobs, the world and most of the in-game HUD (hearts, XP bar, crosshair) stay exactly as they are; only the hotbar and boss health bars get the CYBER//UI look.
 
 Black panels, acid-yellow frames, neon-red accents and a bit of glitch.
 
@@ -24,7 +24,8 @@ Black panels, acid-yellow frames, neon-red accents and a bit of glitch.
 | Menu backgrounds, separators | Near-black background with scanlines, yellow and red separators |
 | Boss bars | Dark chamfered casing with a neon striped fill that crawls (all 7 colours), tick-mark notches |
 | Title logo | Yellow and red with a chromatic "double image" |
-| Title panorama | The 1.21.4 panorama in a night-city colour grade with scanlines and a vignette |
+| Hotbar | Dark armoured strip with slot wells, a neon edge with a running glint and a breathing target-frame selection |
+| Title panorama | The 1.21.4 Pale Garden panorama in a night-city colour grade with scanlines and a vignette |
 | Loading screen | Black instead of red when resources are reloaded |
 
 Container titles are drawn in a hard-coded dark grey that would be unreadable on dark panels. A small core shader recolours **only that colour and only on menu screens**, so text in the world is never affected.
