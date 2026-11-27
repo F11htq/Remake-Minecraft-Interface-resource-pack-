@@ -6,6 +6,7 @@ on:
       - "mod/**"
       - ".github/workflows/build-mod.yml"
       - ".github/scripts/**"
+      - "CYBER-UI-26.3.zip"
   workflow_dispatch:
 
 permissions:
@@ -46,8 +47,8 @@ jobs:
           JAR=$(ls mod/build/libs/*.jar | grep -v -- '-sources' | head -n 1)
           cp "$JAR" cyber-ui-mod-26.3.jar
           gh release delete mod-latest --cleanup-tag --yes || true
-          gh release create mod-latest cyber-ui-mod-26.3.jar \
+          gh release create mod-latest cyber-ui-mod-26.3.jar CYBER-UI-26.3.zip \
             --target "$GITHUB_SHA" \
             --prerelease \
-            --title "CYBER//UI mod (latest build)" \
-            --notes "Fabric 26.3 (Java 25). Put the jar into the mods folder. Built from ${GITHUB_SHA}."
+            --title "CYBER//UI for 26.3 (latest build)" \
+            --notes "Minecraft 26.3. Mod: cyber-ui-mod-26.3.jar into the mods folder (Fabric Loader, Java 25). Resource pack: CYBER-UI-26.3.zip into the resourcepacks folder, do not unzip. Built from ${GITHUB_SHA}."

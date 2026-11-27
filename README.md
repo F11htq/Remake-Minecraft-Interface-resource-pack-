@@ -6,7 +6,7 @@
 
 ## Установка (без модов)
 
-1. Скачай готовый пак: [CYBER-UI-26.3.zip](https://github.com/f11htq/remake-minecraft-interface-resource-pack-/raw/claude/charming-maxwell-r48eep/CYBER-UI-26.3.zip)
+1. Скачай готовый пак: [CYBER-UI-26.3.zip](https://github.com/F11htq/Remake-Minecraft-Interface-resource-pack-/releases/download/mod-latest/CYBER-UI-26.3.zip)
 2. Положи файл (не распаковывая) в папку `resourcepacks` игры.
    Открыть её проще всего из игры: Настройки → Пакеты ресурсов → «Открыть папку пакетов».
 3. Включи **CYBER//UI** в списке пакетов и нажми «Готово».
