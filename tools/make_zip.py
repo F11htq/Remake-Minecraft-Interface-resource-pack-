@@ -9,6 +9,8 @@ OUT = os.path.join(ROOT, "CYBER-UI-26.3.zip")
 
 
 def main():
+    import optimize_png
+    optimize_png.main()
     with zipfile.ZipFile(OUT, "w", zipfile.ZIP_DEFLATED) as z:
         for name in ("pack.mcmeta", "pack.png", "LICENSE"):
             z.write(os.path.join(ROOT, name), name)

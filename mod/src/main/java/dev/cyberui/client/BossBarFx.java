@@ -92,11 +92,14 @@ public final class BossBarFx {
         float lastX = 0.0F;
         int lastY = 0;
         String name = "";
+        Component nameSource = null;
+        boolean raidVictory = false;
         final List<Particle> particles = new ArrayList<>();
         float spawnAcc = 0.0F;
     }
 
     private static final Map<UUID, State> STATES = new HashMap<>();
+    private static final Set<UUID> ALIVE = new HashSet<>();
     private static final Random RANDOM = new Random();
     private static long lastFrame = 0L;
 
@@ -162,7 +165,8 @@ public final class BossBarFx {
         int sw = g.guiWidth();
         int sh = g.guiHeight();
 
-        Set<UUID> alive = new HashSet<>();
+        Set<UUID> alive = ALIVE;
+        alive.clear();
         int y = 4;
         for (LerpingBossEvent event : events.values()) {
             alive.add(event.getId());
@@ -188,7 +192,11 @@ public final class BossBarFx {
             State st = STATES.computeIfAbsent(mob.id(), id -> new State());
             st.style = mob.style();
             st.gg = mob.gg();
-            st.name = mob.entity().getDisplayName().getString();
+            Component mobName = mob.entity().getDisplayName();
+            if (!mobName.equals(st.nameSource)) {
+                st.nameSource = mobName;
+                st.name = mobName.getString();
+            }
             st.lastX = sw / 2.0F;
             st.lastY = y;
             track(st, mob.progress(), now, dt);
@@ -254,21 +262,27 @@ public final class BossBarFx {
     }
 
     private static void update(State st, LerpingBossEvent event, long now, float dt) {
-        Set<String> keys = new HashSet<>();
-        collectKeys(event.getName(), keys);
-        if (keys.contains("entity.minecraft.ender_dragon")) {
-            st.style = Style.DRAGON;
-        } else if (keys.contains("entity.minecraft.wither")) {
-            st.style = Style.WITHER;
-        } else if (keys.contains("event.minecraft.raid")) {
-            st.style = Style.RAID;
-        } else {
-            st.style = Style.GENERIC;
+        Component name = event.getName();
+        if (name != st.nameSource) {
+            // the name only changes on a server update: classify it once, not every frame
+            st.nameSource = name;
+            Set<String> keys = new HashSet<>();
+            collectKeys(name, keys);
+            if (keys.contains("entity.minecraft.ender_dragon")) {
+                st.style = Style.DRAGON;
+            } else if (keys.contains("entity.minecraft.wither")) {
+                st.style = Style.WITHER;
+            } else if (keys.contains("event.minecraft.raid")) {
+                st.style = Style.RAID;
+            } else {
+                st.style = Style.GENERIC;
+            }
+            st.raidVictory = keys.contains("event.minecraft.raid.victory");
+            st.name = name.getString();
         }
-        st.name = event.getName().getString();
         track(st, event.getProgress(), now, dt);
 
-        if (!st.triggered && st.seenAlive && st.style == Style.RAID && keys.contains("event.minecraft.raid.victory")) {
+        if (!st.triggered && st.seenAlive && st.style == Style.RAID && st.raidVictory) {
             st.triggered = true;
             startVictory("RAID VICTORY", "", Style.RAID.neon);
         }

@@ -87,9 +87,8 @@ public final class Draw {
      * elements low (the loading screen draws a lot of this text every frame).
      */
     public static int text(GuiGraphicsExtractor g, int x, int y, String s, int scale, int argb) {
-        String up = s.toUpperCase(java.util.Locale.ROOT);
-        for (int c = 0; c < up.length(); c++) {
-            int idx = CHARS.indexOf(up.charAt(c));
+        for (int c = 0; c < s.length(); c++) {
+            int idx = CHARS.indexOf(Character.toUpperCase(s.charAt(c)));
             if (idx >= 0) {
                 String glyph = GLYPHS[idx];
                 for (int row = 0; row < 5; row++) {

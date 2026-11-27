@@ -24,7 +24,7 @@ public abstract class AbstractEndPortalRendererMixin {
                                      Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress,
                                      CallbackInfo ci) {
         if ((Object) this instanceof TheEndPortalRenderer && PortalBeam.isAnchor(be)) {
-            ((BeamCarrier) state).cyberui$setBeam(PortalBeam.extract(be, partialTicks));
+            ((BeamCarrier) state).cyberui$setBeam(PortalBeam.extract(be, partialTicks, cameraPosition));
         }
     }
 }

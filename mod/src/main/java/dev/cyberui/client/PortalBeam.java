@@ -18,6 +18,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.TheEndPortalBlockEntity;
+import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -34,7 +35,7 @@ public final class PortalBeam {
 
     /** Everything the render thread needs to draw the beam for one frame. */
     public record Snapshot(float time, float sinceImpact, float tip, float depth, float width, float flash,
-                           float open) {
+                           float open, int segments) {
     }
 
     private static final Identifier BEAM = Identifier.withDefaultNamespace("textures/entity/beacon/beacon_beam.png");
@@ -89,7 +90,7 @@ public final class PortalBeam {
     }
 
     /** Extract phase (game thread): advances the animation, plays sounds and spawns particles. */
-    public static Snapshot extract(TheEndPortalBlockEntity be, float partialTick) {
+    public static Snapshot extract(TheEndPortalBlockEntity be, float partialTick, Vec3 camera) {
         Level level = be.getLevel();
         long tick = level.getGameTime();
         long now = Util.getMillis();
@@ -124,7 +125,13 @@ public final class PortalBeam {
                     3.0F, 0.6F, false);
         }
         spawnParticles(level, baseY, tick, sinceImpact);
-        return new Snapshot(time, sinceImpact, tip, depth, width, flash, open);
+        // level of detail: the column is 3.6 blocks wide, so far away fewer
+        // sides look exactly the same while costing a fraction of the vertices
+        double dx = camera.x - 0.5;
+        double dz = camera.z - 0.5;
+        double dist = Math.sqrt(dx * dx + dz * dz);
+        int segments = dist < 48.0 ? SEGMENTS : dist < 112.0 ? SEGMENTS / 2 : SEGMENTS / 4;
+        return new Snapshot(time, sinceImpact, tip, depth, width, flash, open, segments);
     }
 
     /** Submit phase: queues the beam geometry (the anchor block's pose is on the stack). */
@@ -144,11 +151,12 @@ public final class PortalBeam {
         float w = s.width();
         float[] ys = streakHeights(s.tip(), s.depth());
         // white-hot core: translucent like everything else, so the pillar and dragon egg show through
-        streakLayer(vc, m, 0.6F * w, 0xFFFFFF, 0.45F, s.time(), ys, s.tip(), s.depth(), spin * 2.0F, 2.2F);
-        streakLayer(vc, m, 1.1F * w, 0xF0DCFF, 0.40F, s.time(), ys, s.tip(), s.depth(), -spin * 1.8F, 1.9F);
-        streakLayer(vc, m, 1.9F * w, 0xFF70F0, 0.60F, s.time(), ys, s.tip(), s.depth(), -spin * 1.6F, 1.6F);
-        streakLayer(vc, m, 2.8F * w, 0xC24CFF, 0.42F, s.time(), ys, s.tip(), s.depth(), spin * 1.2F, 1.1F);
-        streakLayer(vc, m, RADIUS * w, 0x8A34F0, 0.30F, s.time(), ys, s.tip(), s.depth(), -spin, 0.8F);
+        int n = s.segments();
+        streakLayer(vc, m, n, 0.6F * w, 0xFFFFFF, 0.45F, s.time(), ys, s.tip(), s.depth(), spin * 2.0F, 2.2F);
+        streakLayer(vc, m, n, 1.1F * w, 0xF0DCFF, 0.40F, s.time(), ys, s.tip(), s.depth(), -spin * 1.8F, 1.9F);
+        streakLayer(vc, m, n, 1.9F * w, 0xFF70F0, 0.60F, s.time(), ys, s.tip(), s.depth(), -spin * 1.6F, 1.6F);
+        streakLayer(vc, m, n, 2.8F * w, 0xC24CFF, 0.42F, s.time(), ys, s.tip(), s.depth(), spin * 1.2F, 1.1F);
+        streakLayer(vc, m, n, RADIUS * w, 0x8A34F0, 0.30F, s.time(), ys, s.tip(), s.depth(), -spin, 0.8F);
     }
 
     private static void glow(VertexConsumer vc, PoseStack.Pose m, Snapshot s) {
@@ -164,9 +172,9 @@ public final class PortalBeam {
         } else {
             // soft halo around the column, flaring on impact
             float glowBoost = 1.0F + 2.5F * flash;
-            haloLayer(vc, m, 0.5F * width, 0xFFFFFF, 0.22F * glowBoost, time, tip, s.depth());
-            haloLayer(vc, m, (RADIUS + 0.9F) * width, 0x9A3CFF, 0.10F * glowBoost, time, tip, s.depth());
-            haloLayer(vc, m, (RADIUS + 2.4F) * width, 0x6A22D0, 0.05F * glowBoost, time, tip, s.depth());
+            haloLayer(vc, m, s.segments(), 0.5F * width, 0xFFFFFF, 0.22F * glowBoost, time, tip, s.depth());
+            haloLayer(vc, m, s.segments(), (RADIUS + 0.9F) * width, 0x9A3CFF, 0.10F * glowBoost, time, tip, s.depth());
+            haloLayer(vc, m, s.segments(), (RADIUS + 2.4F) * width, 0x6A22D0, 0.05F * glowBoost, time, tip, s.depth());
             // the beam glows brightest where it leaves the portal
             float base = (0.32F + 0.08F * Mth.sin(time * 5.0F)) * Math.min(1.0F, s.open() * 2.0F) + 0.6F * flash;
             wall(vc, m, RADIUS + 1.2F, 0.0F, 5.0F, 0xE070FF, base, 0.0F);
@@ -251,7 +259,7 @@ public final class PortalBeam {
     }
 
     /** Textured cylinder with the beam texture streaming upwards, from the bottom to the sky. */
-    private static void streakLayer(VertexConsumer vc, PoseStack.Pose m, float r, int rgb, float alpha, float time,
+    private static void streakLayer(VertexConsumer vc, PoseStack.Pose m, int segments, float r, int rgb, float alpha, float time,
                                     float[] ys, float bottom, float depth, float spin, float speed) {
         int cr = (rgb >> 16) & 255;
         int cg = (rgb >> 8) & 255;
@@ -261,16 +269,16 @@ public final class PortalBeam {
         for (int k = 0; k < ys.length; k++) {
             as[k] = Mth.clamp((int) (alpha * fade(ys[k], bottom, depth) * 255), 0, 255);
         }
-        for (int i = 0; i < SEGMENTS; i++) {
-            float t0 = spin + (float) (i * Math.PI * 2.0 / SEGMENTS);
-            float t1 = spin + (float) ((i + 1) * Math.PI * 2.0 / SEGMENTS);
+        for (int i = 0; i < segments; i++) {
+            float t0 = spin + (float) (i * Math.PI * 2.0 / segments);
+            float t1 = spin + (float) ((i + 1) * Math.PI * 2.0 / segments);
             float x0 = Mth.cos(t0) * r;
             float z0 = Mth.sin(t0) * r;
             float x1 = Mth.cos(t1) * r;
             float z1 = Mth.sin(t1) * r;
             // the texture wraps around the column three times
-            float u0 = i * 3.0F / SEGMENTS;
-            float u1 = (i + 1) * 3.0F / SEGMENTS;
+            float u0 = i * 3.0F / segments;
+            float u1 = (i + 1) * 3.0F / segments;
             for (int k = 0; k + 1 < ys.length; k++) {
                 float y0 = ys[k];
                 float y1 = ys[k + 1];
@@ -300,12 +308,12 @@ public final class PortalBeam {
     }
 
     /** Soft additive halo around the column, with slow pulses travelling upwards. */
-    private static void haloLayer(VertexConsumer vc, PoseStack.Pose m, float r, int rgb, float alpha, float time,
+    private static void haloLayer(VertexConsumer vc, PoseStack.Pose m, int segments, float r, int rgb, float alpha, float time,
                                   float bottom, float depth) {
         float step = 10.0F;
-        for (int i = 0; i < SEGMENTS; i++) {
-            float t0 = (float) (i * Math.PI * 2.0 / SEGMENTS);
-            float t1 = (float) ((i + 1) * Math.PI * 2.0 / SEGMENTS);
+        for (int i = 0; i < segments; i++) {
+            float t0 = (float) (i * Math.PI * 2.0 / segments);
+            float t1 = (float) ((i + 1) * Math.PI * 2.0 / segments);
             float x0 = Mth.cos(t0) * r;
             float z0 = Mth.sin(t0) * r;
             float x1 = Mth.cos(t1) * r;

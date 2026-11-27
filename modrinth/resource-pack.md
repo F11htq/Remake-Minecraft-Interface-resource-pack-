@@ -25,7 +25,7 @@ Black panels, acid-yellow frames, neon-red accents and a bit of glitch.
 | Boss bars | Dark chamfered casing with a neon striped fill that crawls (all 7 colours), tick-mark notches |
 | Title logo | Yellow and red with a chromatic "double image" |
 | Hotbar | Dark armoured strip with slot wells, a neon edge with a running glint and a breathing target-frame selection |
-| Title panorama | The 1.21.4 Pale Garden panorama in a night-city colour grade with scanlines and a vignette |
+| Title panorama | The 26.3 autumn forest panorama turned into night: violet sky, neon sun, a crimson city glow on the horizon, scanlines and a vignette |
 | Loading screen | Black instead of red when resources are reloaded |
 
 Container titles are drawn in a hard-coded dark grey that would be unreadable on dark panels. A small core shader recolours **only that colour and only on menu screens**, so text in the world is never affected.

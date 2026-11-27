@@ -4,8 +4,11 @@
 Usage:
     python3 tools/build_mod_assets.py --panoramas <dir>
 
-<dir> holds a sub-folder "1.21.4" with panorama_0..5.png from the 1.21.4
-client jar. Run tools/build_pack.py
+<dir> holds a sub-folder "26.3" with panorama_0..5.png of the 26.3 title
+panorama. Since 26.x the real faces are no longer in the client jar (it only
+has 1x1 placeholders); take them from the asset index
+(minecraft/textures/gui/title/background/panorama_N.png), e.g. from
+.minecraft/assets/objects or with tools/fetch_panorama.py. Run tools/build_pack.py
 first: the loading-screen logo is made from the pack's re-coloured logo.
 
 Writes into mod/src/main/resources/assets/cyberui/.
@@ -27,7 +30,7 @@ OUT = os.path.join(ROOT, "mod", "src", "main", "resources", "assets", "cyberui")
 TEX = os.path.join(OUT, "textures", "gui")
 
 # version -> folder name of the panorama bundled in the mod
-PANORAMAS = {"1.21.4": "pale_garden"}
+PANORAMAS = {"26.3": "autumn"}
 
 FONT = {
     "A": "010101111101101", "B": "110101110101110", "C": "011100100100011", "D": "110101101101110",
@@ -133,7 +136,7 @@ def build_panoramas(source):
         d = os.path.join(TEX, "panorama", name)
         os.makedirs(d, exist_ok=True)
         for i in range(6):
-            g = bpano.grade(Image.open(os.path.join(source, version, "panorama_%d.png" % i)))
+            g = bpano.grade(Image.open(os.path.join(source, version, "panorama_%d.png" % i)), i)
             g.save(os.path.join(d, "panorama_%d.png" % i), optimize=True)
         print("panorama", name)
 
@@ -171,7 +174,7 @@ def build_mod_icon():
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--panoramas", help="folder with a 1.21.4 sub-folder of vanilla panorama_0..5.png; skipped when omitted")
+    ap.add_argument("--panoramas", help="folder with a 26.3 sub-folder of vanilla panorama_0..5.png (tools/fetch_panorama.py); skipped when omitted")
     args = ap.parse_args()
     build_status_panel()
     build_loading_logo()
@@ -179,6 +182,8 @@ def main():
     if args.panoramas:
         build_panoramas(args.panoramas)
     build_mod_icon()
+    import optimize_png
+    optimize_png.main()
 
 
 if __name__ == "__main__":

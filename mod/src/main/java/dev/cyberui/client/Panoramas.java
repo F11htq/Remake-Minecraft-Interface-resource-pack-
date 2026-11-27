@@ -10,7 +10,7 @@ public final class Panoramas {
 
     private static final String VANILLA_PATH = "textures/gui/title/background/panorama";
     private static final Identifier CYBER =
-            Identifier.fromNamespaceAndPath("cyberui", "textures/gui/panorama/pale_garden/panorama");
+            Identifier.fromNamespaceAndPath("cyberui", "textures/gui/panorama/autumn/panorama");
 
     private Panoramas() {
     }

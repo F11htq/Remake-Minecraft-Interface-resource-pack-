@@ -17,7 +17,7 @@ The companion mod for the **CYBER//UI** resource pack. It adds what a resource p
   - glitch bursts every few seconds;
   - a scan line sweep and a gentle float.
 - A **SYS//STAT** HUD panel slides in on the right, and a hazard strip runs along the bottom.
-- The Pale Garden panorama in the CYBER//UI night-city colour grade, even without the resource pack.
+- The 26.3 autumn forest panorama turned into a night scene (violet sky, neon sun, a city glow on the horizon), even without the resource pack.
 - An **animated hotbar**: it boots up when you join a world or respawn (rises into place, slots come online one by one behind a scan line), the selection frame glides between slots with afterimages and a red/cyan split, the selected item lifts and its slot number flashes, picked-up items flash their slot, nearly broken tools pulse red, and the item name is typed out on a name plate in its rarity colour.
 
 ## Loading screen

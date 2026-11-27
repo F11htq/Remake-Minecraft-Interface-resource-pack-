@@ -170,16 +170,26 @@ public final class LoadingScreen {
         }
     }
 
+    private static long hexSeed = -1L;
+    private static String hexText = "";
+
+    /** Scrolling hex dump; rebuilt only when it changes (every 110 ms), not every frame. */
     private static String hexLine(long now) {
-        StringBuilder sb = new StringBuilder();
         long seed = now / 110L;
-        for (int i = 0; i < 9; i++) {
-            long v = (seed * 6364136223846793005L + i * 1442695040888963407L) >>> 48;
-            sb.append(String.format("%04X", v & 0xFFFF));
-            if (i < 8) {
-                sb.append(' ');
+        if (seed != hexSeed) {
+            hexSeed = seed;
+            StringBuilder sb = new StringBuilder(44);
+            for (int i = 0; i < 9; i++) {
+                long v = ((seed * 6364136223846793005L + i * 1442695040888963407L) >>> 48) & 0xFFFF;
+                for (int shift = 12; shift >= 0; shift -= 4) {
+                    sb.append(Character.toUpperCase(Character.forDigit((int) ((v >> shift) & 0xF), 16)));
+                }
+                if (i < 8) {
+                    sb.append(' ');
+                }
             }
+            hexText = sb.toString();
         }
-        return sb.toString();
+        return hexText;
     }
 }
